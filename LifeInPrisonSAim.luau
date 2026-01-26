@@ -1,86 +1,97 @@
-local Services=setmetatable({},{__index=function(Self,Name)
+Services=setmetatable({},{__index=function(Self,Name)
 	Self[Name]=game:GetService(Name)
 	return Self[Name]
 end})
 
-local Players=Services.Players
-local Workspace=Services.Workspace
-local ReplicatedStorage=Services.ReplicatedStorage
-local LocalPlayer=Players.LocalPlayer
-local Camera=Workspace.CurrentCamera
+Players=Services.Players
+Workspace=Services.Workspace
+ReplicatedStorage=Services.ReplicatedStorage
+LocalPlayer=Players.LocalPlayer
+Camera=Workspace.CurrentCamera
 
-local Target=nil
-local CanShoot=true
-local RemoteEvent=ReplicatedStorage.Events.RemoteEvent
+Target=nil
+Priority=nil
+RemoteEvent=ReplicatedStorage.Events.RemoteEvent
 
-local o;o=hookmetamethod(game,"__namecall",newcclosure(function(...)
-	local Arguments={...}
-	local Method=getnamecallmethod()
-	
-	if not checkcaller() and Arguments[1]==RemoteEvent and Method=="FireServer" and Arguments[2]==14 and Target and typeof(Target)=="Instance" and CanShoot then
-		local BulletTable=Arguments[4]
-		if type(BulletTable)=="table" and BulletTable[1] then
-			local BulletData=BulletTable[1]
-			if type(BulletData)=="table" and type(BulletData[4])=="userdata" then
-				local StartPosition=Camera.CFrame.Position
-				local TargetPosition=Target.Position
-				local Direction=(TargetPosition-StartPosition).Unit
-				
-				BulletData[1]=StartPosition
-				BulletData[2]=StartPosition+(Direction*10)
-				BulletData[3]=TargetPosition
-				BulletData[4]=Target
-				BulletData[5]=TargetPosition
-				BulletData[6]=Vector3.new(0,0,0)
+if TeamCheck and TeamCheck~="" then
+	ExcludedTeams={}
+	for TeamName in string.gmatch(TeamCheck,"[^,]+") do
+		TeamExists=false
+		for _,Team in Services.Teams:GetTeams() do
+			if Team.Name==TeamName then
+				TeamExists=true
+				table.insert(ExcludedTeams,TeamName)
+				break
+			end
+		end
+		if not TeamExists then
+			warn("This team doesn't exist: "..TeamName)
+		end
+	end
+	AllTeams=Services.Teams:GetTeams()
+	if #ExcludedTeams>=#AllTeams then
+		error("You cannot exclude every teams in the game")
+	end
+end
+
+o=nil;o=hookmetamethod(game,"__namecall",newcclosure(function(...)
+	Arguments={...}
+	Method=getnamecallmethod()
+	if not checkcaller() and Arguments[1]==RemoteEvent and Method=="FireServer" and Arguments[2]==14 then
+		FinalTarget=Priority or Target
+		if FinalTarget and typeof(FinalTarget)=="Instance" then
+			BulletTable=Arguments[4]
+			if type(BulletTable)=="table" and BulletTable[1] then
+				BulletData=BulletTable[1]
+				if type(BulletData)=="table" and type(BulletData[4])=="userdata" then
+					StartPosition=Camera.CFrame.Position
+					TargetPosition=FinalTarget.Position
+					Direction=(TargetPosition-StartPosition).Unit
+					BulletData[1]=StartPosition
+					BulletData[2]=StartPosition+(Direction*10)
+					BulletData[3]=TargetPosition
+					BulletData[4]=FinalTarget
+					BulletData[5]=TargetPosition
+					BulletData[6]=Vector3.new(0,0,0)
+				end
 			end
 		end
 	end
-	
 	return o(...)
 end))
 
 Services.RunService.RenderStepped:Connect(function()
-	local Character=LocalPlayer.Character
-	if not Character then Target=nil return end
-	local Root=Character:FindFirstChild("HumanoidRootPart")
-	if not Root then Target=nil return end
-	
-	local Closest=nil
-	local Distance=math.huge
-	
+	Character=LocalPlayer.Character
+	if not Character then Target=nil Priority=nil return end
+	Root=Character:FindFirstChild("HumanoidRootPart")
+	if not Root then Target=nil Priority=nil return end
+	Closest=nil
+	Distance=math.huge
+	Near=nil
 	for _,Player in Players:GetPlayers() do
 		if Player==LocalPlayer then continue end
-		if Player.Team and LocalPlayer.Team and Player.Team==LocalPlayer.Team then continue end
-		local TargetCharacter=Player.Character
+		if Player.Team==LocalPlayer.Team then continue end
+		TargetCharacter=Player.Character
 		if not TargetCharacter then continue end
-		local TargetHumanoid=TargetCharacter:FindFirstChildOfClass("Humanoid")
+		TargetHumanoid=TargetCharacter:FindFirstChildOfClass("Humanoid")
 		if not TargetHumanoid or TargetHumanoid.Health<=0 then continue end
-		local TargetHead=TargetCharacter:FindFirstChild("Head")
-		if not TargetHead then continue end
-		local Dist=(Root.Position-TargetHead.Position).Magnitude
-		if Dist<Distance then
-			Distance=Dist
-			Closest=TargetHead
+		if TargetCharacter:FindFirstChildOfClass("ForceField") then continue end
+		if TeamCheck and TeamCheck~="" then
+			PlayerTeam=Player.Team and Player.Team.Name or ""
+			Skip=false
+			for TeamName in string.gmatch(TeamCheck,"[^,]+") do
+				if PlayerTeam==TeamName then Skip=true break end
+			end
+			if Skip then continue end
 		end
+		TargetHead=TargetCharacter:FindFirstChild("Head")
+		if not TargetHead then continue end
+		Dist=(Root.Position-TargetHead.Position).Magnitude
+		if Dist<50 and(not Near or Dist<(Root.Position-Near.Position).Magnitude)then Near=TargetHead end
+		if Dist<Distance then Distance=Dist Closest=TargetHead end
 	end
-	
+	Priority=Near
 	Target=Closest
-	
-	if Target then
-		local Params=RaycastParams.new()
-		Params.FilterDescendantsInstances={Character,Target.Parent}
-		Params.FilterType=Enum.RaycastFilterType.Exclude
-		
-		local Origin=Root.Position
-		local Destination=Target.Position
-		local Direction=(Destination-Origin)
-		
-		local WallCheck=Workspace:Raycast(Origin,Direction,Params)
-		
-		CanShoot=not WallCheck
-	else
-		CanShoot=false
-	end
 end)
 
-warn("ok")
+warn("loaded")
