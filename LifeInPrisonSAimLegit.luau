@@ -1,5 +1,6 @@
 getgenv().hdjsjxjsjsjsksjsjhi = getgenv().hdjsjxjsjsjsksjsjhi or {
-	FovSize = 143,
+	FovSize = 126,
+	HitChance = 73,
 	IgnorePolice = false,
 	IgnoreCriminals = false,
 	IgnorePrisoners = false
@@ -51,17 +52,20 @@ local o;o = hookmetamethod(game, "__namecall", newcclosure(function(...)
 	local CalledSelf = Arguments[1]
 	if CalledSelf == Workspace and not checkcaller() then
 		if CurrentTarget then
-			if CalledMethod == "FindPartOnRayWithIgnoreList" or CalledMethod == "FindPartOnRayWithWhitelist" or CalledMethod == "FindPartOnRay" or CalledMethod == "findPartOnRay" then
-				local RayOrigin = Arguments[2].Origin
-				local TargetPosition = CurrentTarget.Position
-				local RayDirection = TargetPosition - RayOrigin
-				Arguments[2] = Ray.new(RayOrigin, RayDirection)
-				return o(unpack(Arguments))
-			elseif CalledMethod == "Raycast" then
-				local RayOrigin = Arguments[2]
-				local TargetPosition = CurrentTarget.Position
-				Arguments[3] = TargetPosition - RayOrigin
-				return o(unpack(Arguments))
+			local HitRoll = math.random(1, 100)
+			if HitRoll <= getgenv().hdjsjxjsjsjsksjsjhi.HitChance then
+				if CalledMethod == "FindPartOnRayWithIgnoreList" or CalledMethod == "FindPartOnRayWithWhitelist" or CalledMethod == "FindPartOnRay" or CalledMethod == "findPartOnRay" then
+					local RayOrigin = Arguments[2].Origin
+					local TargetPosition = CurrentTarget.Position
+					local RayDirection = TargetPosition - RayOrigin
+					Arguments[2] = Ray.new(RayOrigin, RayDirection)
+					return o(unpack(Arguments))
+				elseif CalledMethod == "Raycast" then
+					local RayOrigin = Arguments[2]
+					local TargetPosition = CurrentTarget.Position
+					Arguments[3] = TargetPosition - RayOrigin
+					return o(unpack(Arguments))
+				end
 			end
 		end
 	end
