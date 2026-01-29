@@ -1,4 +1,3 @@
-
 local GetService = setmetatable({}, {
 	__index = function(Table, Index)
 		Table[Index] = game:GetService(Index)
@@ -9,7 +8,7 @@ local GetService = setmetatable({}, {
 local LocalPlayer = GetService.Players.LocalPlayer
 local RemoteEvent = GetService.ReplicatedStorage:FindFirstChild("Events"):FindFirstChild("RemoteEvent")
 local Teams = GetService.Teams
-local Camera = workspace.CurrentCamera
+local Camera = GetService.Workspace.CurrentCamera
 
 local MyChar = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 local OriginalTeam = LocalPlayer.Team
