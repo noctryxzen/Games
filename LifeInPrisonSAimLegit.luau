@@ -14,43 +14,25 @@ local GetService = setmetatable({}, {
 })
 
 local Players = GetService.Players
-local Workspace = GetService.Workspace
 local RunService = GetService.RunService
 local UserInputService = GetService.UserInputService
 local LocalPlayer = Players.LocalPlayer
-local Camera = Workspace.CurrentCamera
+local Camera = workspace.CurrentCamera
 
 local CurrentTarget = nil
 local MousePosition = nil
 
-local ScreenGui = Instance.new("ScreenGui")
-local FovCircle = Instance.new("Frame")
-local CircleCorner = Instance.new("UICorner")
-local CircleStroke = Instance.new("UIStroke")
-
-ScreenGui.Parent = gethui and gethui() or GetService.CoreGui
-ScreenGui.IgnoreGuiInset = true
-FovCircle.Parent = ScreenGui
-FovCircle.AnchorPoint = Vector2.new(0.5, 0.5)
-FovCircle.BackgroundTransparency = 1
-CircleCorner.CornerRadius = UDim.new(1, 0)
-CircleCorner.Parent = FovCircle
-CircleStroke.Color = Color3.fromRGB(29, 51, 222)
-CircleStroke.Thickness = 1
-CircleStroke.Transparency = 0.5
-CircleStroke.Parent = FovCircle
-
-UserInputService.InputChanged:Connect(function(Input)
-	if Input.UserInputType == Enum.UserInputType.MouseMovement then
-		MousePosition = Vector2.new(Input.Position.X, Input.Position.Y)
-	end
-end)
+local FovCircle = Drawing.new("Circle")
+FovCircle.Position = UserInputService:GetMouseLocation()
+FovCircle.Radius = getgenv().hdjsjxjsjsjsksjsjhi.FovSize
+FovCircle.Visible = true
+FovCircle.Color = Color3.fromRGB(255, 0, 0)
 
 local o;o = hookmetamethod(game, "__namecall", newcclosure(function(...)
 	local Arguments = {...}
 	local CalledMethod = getnamecallmethod()
 	local CalledSelf = Arguments[1]
-	if CalledSelf == Workspace and not checkcaller() then
+	if CalledSelf == workspace and not checkcaller() then
 		if CurrentTarget then
 			local HitRoll = math.random(1, 100)
 			if HitRoll <= getgenv().hdjsjxjsjsjsksjsjhi.HitChance then
@@ -73,6 +55,7 @@ local o;o = hookmetamethod(game, "__namecall", newcclosure(function(...)
 end))
 
 RunService.RenderStepped:Connect(function()
+    FovCircle.Position = UserInputService:GetMouseLocation()
 	local PlayerCharacter = LocalPlayer.Character
 	if not PlayerCharacter then
 		CurrentTarget = nil
@@ -83,10 +66,6 @@ RunService.RenderStepped:Connect(function()
 		CurrentTarget = nil
 		return
 	end
-	local ScreenSize = Camera.ViewportSize
-	local ScreenCenter = MousePosition or Vector2.new(ScreenSize.X / 2, ScreenSize.Y / 2)
-	FovCircle.Position = UDim2.new(0, ScreenCenter.X, 0, ScreenCenter.Y)
-	FovCircle.Size = UDim2.new(0, getgenv().hdjsjxjsjsjsksjsjhi.FovSize * 2, 0, getgenv().hdjsjxjsjsjsksjsjhi.FovSize * 2)
 	local CameraPosition = Camera.CFrame.Position
 	local CameraLookVector = Camera.CFrame.LookVector
 	CurrentTarget = nil
@@ -110,13 +89,13 @@ RunService.RenderStepped:Connect(function()
 		local ScreenPosition, IsOnScreen = Camera:WorldToViewportPoint(HeadPosition)
 		if IsOnScreen then
 			local ScreenVector = Vector2.new(ScreenPosition.X, ScreenPosition.Y)
-			local DistanceFromCenter = (ScreenVector - ScreenCenter).Magnitude
+			local DistanceFromCenter = (ScreenVector - UserInputService:GetMouseLocation()).Magnitude
 			if DistanceFromCenter <= getgenv().hdjsjxjsjsjsksjsjhi.FovSize and DistanceFromCenter < ClosestDistance then
 				local DirectionToTarget = (HeadPosition - CameraPosition).Unit
 				local DotProduct = CameraLookVector:Dot(DirectionToTarget)
 				if DotProduct > 0 then
 					local WallCheckRay = Ray.new(CameraPosition, HeadPosition - CameraPosition)
-					local RayHit = Workspace:FindPartOnRayWithIgnoreList(WallCheckRay, {PlayerCharacter})
+					local RayHit = workspace:FindPartOnRayWithIgnoreList(WallCheckRay, {PlayerCharacter})
 					local IsVisible = false
 					if RayHit then
 						if RayHit.Parent == TargetCharacter or RayHit.Parent.Parent == TargetCharacter then
