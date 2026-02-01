@@ -12,25 +12,32 @@ local Pickups = GetService.Workspace:WaitForChild("pickups")
 local Connections = getconnections(Remote.OnClientEvent)
 
 for _, Connection in Connections do
-    local o = Connection.Function
+    local Original = Connection.Function
     
     Connection:Disable()
     
     Remote.OnClientEvent:Connect(function(...)
-        local a = {...}
+        local Args = {...}
         
-        if a[1] == 27 and type(a[2]) == "string" then
-            if a[2]:match("^You already have") or a[2]:match("^You do not have the") then
+        if Args[1] == 27 and type(Args[2]) == "string" then
+            if Args[2]:match("^You already have") or Args[2]:match("^You do not have the") then
                 return
             end
         end
         
-        o(...)
+        Original(...)
     end)
 end
 
 Pickups.ChildAdded:Connect(function(Item)
-    Remote:FireServer(12, Item)
+    local Backpack = Local:FindFirstChild("Backpack")
+    local Character = Local.Character
+    
+    if Backpack and Character then
+        if not (Backpack:FindFirstChild(Item.Name) or Character:FindFirstChild(Item.Name)) then
+            Remote:FireServer(12, Item)
+        end
+    end
 end)
 
 Pickups.ChildRemoved:Connect(function(Item)
@@ -38,15 +45,29 @@ Pickups.ChildRemoved:Connect(function(Item)
 end)
 
 for _, Item in Pickups:GetChildren() do
-    Remote:FireServer(12, Item)
+    local Backpack = Local:FindFirstChild("Backpack")
+    local Character = Local.Character
+    
+    if Backpack and Character then
+        if not (Backpack:FindFirstChild(Item.Name) or Character:FindFirstChild(Item.Name)) then
+            Remote:FireServer(12, Item)
+        end
+    end
 end
 
 task.spawn(function()
     while true do
-        task.wait(0.2)
+        task.wait(1)
         
         for _, Item in Pickups:GetChildren() do
-            Remote:FireServer(12, Item)
+            local Backpack = Local:FindFirstChild("Backpack")
+            local Character = Local.Character
+            
+            if Backpack and Character then
+                if not (Backpack:FindFirstChild(Item.Name) or Character:FindFirstChild(Item.Name)) then
+                    Remote:FireServer(12, Item)
+                end
+            end
         end
     end
 end)
