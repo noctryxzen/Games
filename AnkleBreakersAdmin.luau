@@ -259,29 +259,42 @@ L[10].MouseButton1Click:Connect(function()
 	local t2 = Players:FindFirstChild(L[7].Text)
 	local r2 = L[8].Text ~= "" and L[8].Text or "No reason provided"
 	local prev2 = L[7].Text
+	if prev2 == "" then
+		L[7].PlaceholderText = "Enter a username to ban..." L[7].BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+		task.wait(1.75) L[7].PlaceholderText = "Target username.." L[7].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		return
+	end
 	if t2 == Players.LocalPlayer then
 		L[7].Text = "" L[7].PlaceholderText = "Why would you want to ban yourself?" L[7].BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 		task.wait(1.75) L[7].PlaceholderText = "Target username.." L[7].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	elseif t2 then
-		RS.RemoteEvents.BanPlayer:FireServer(t2, r2)
-		local r2a = Instance.new("Frame", L[17]) r2a.Size = UDim2.new(1, 0, 0, 22) r2a.BackgroundColor3 = Color3.fromRGB(200, 230, 210) r2a.BackgroundTransparency = 0 r2a.BorderSizePixel = 0
-		local r2b = Instance.new("ImageLabel", r2a) r2b.Size = UDim2.new(0, 18, 0, 18) r2b.Position = UDim2.new(0, 0, 0, 2) r2b.BackgroundTransparency = 1 r2b.BorderSizePixel = 0
-		local ok2, id2 = pcall(function() return Players:GetUserThumbnailAsync(t2.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48) end) if ok2 then r2b.Image = id2 end
-		local r2c = Instance.new("TextLabel", r2a) r2c.Size = UDim2.new(1, -22, 1, 0) r2c.Position = UDim2.new(0, 22, 0, 0) r2c.BackgroundTransparency = 1 r2c.TextScaled = true r2c.TextXAlignment = Enum.TextXAlignment.Left r2c.TextColor3 = Color3.fromRGB(200, 60, 60) r2c.FontFace = Font.new("rbxasset://fonts/families/Arial.json", Enum.FontWeight.Bold) r2c.TextTruncate = Enum.TextTruncate.SplitWord r2c.Text = "Banned: " .. t2.DisplayName .. " @" .. t2.Name
-		local r2d = Instance.new("TextButton", r2a) r2d.Size = UDim2.new(1, 0, 1, 0) r2d.BackgroundTransparency = 1 r2d.Text = "" r2d.ZIndex = 2
-		r2d.MouseButton1Click:Connect(function()
-			setclipboard(t2.Name) toclipboard(t2.Name)
-			r2a.BackgroundColor3 = Color3.fromRGB(200, 230, 210) r2a.BackgroundTransparency = 0
-			TS:Create(r2a, TweenInfo.new(0.5, Enum.EasingStyle.Quart), {BackgroundTransparency = 1}):Play()
-		end)
-		TS:Create(r2a, TweenInfo.new(0.5, Enum.EasingStyle.Quart), {BackgroundTransparency = 1}):Play()
-		task.wait() L[17].CanvasPosition = Vector2.new(0, L[17].AbsoluteCanvasSize.Y)
-		L[7].Text = "" L[7].PlaceholderText = t2.Name .. " was successfully banned!" L[7].BackgroundColor3 = Color3.fromRGB(0, 255, 0) L[8].Text = ""
-		task.wait(1.75) L[7].PlaceholderText = "Target username.." L[7].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	else
-		L[7].Text = "" L[7].PlaceholderText = prev2 .. " could not be banned..." L[7].BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-		task.wait(1.75) L[7].PlaceholderText = "Target username.." L[7].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		return
 	end
+	RS.RemoteEvents.BanPlayer:FireServer(t2 or prev2, r2)
+	local r2a = Instance.new("Frame", L[17]) r2a.Size = UDim2.new(1, 0, 0, 22) r2a.BackgroundColor3 = Color3.fromRGB(200, 230, 210) r2a.BackgroundTransparency = 0 r2a.BorderSizePixel = 0
+	local r2b = Instance.new("ImageLabel", r2a) r2b.Size = UDim2.new(0, 18, 0, 18) r2b.Position = UDim2.new(0, 0, 0, 2) r2b.BackgroundTransparency = 1 r2b.BorderSizePixel = 0
+	local r2c = Instance.new("TextLabel", r2a) r2c.Size = UDim2.new(1, -22, 1, 0) r2c.Position = UDim2.new(0, 22, 0, 0) r2c.BackgroundTransparency = 1 r2c.TextScaled = true r2c.TextXAlignment = Enum.TextXAlignment.Left r2c.TextColor3 = Color3.fromRGB(200, 60, 60) r2c.FontFace = Font.new("rbxasset://fonts/families/Arial.json", Enum.FontWeight.Bold) r2c.TextTruncate = Enum.TextTruncate.SplitWord
+	r2c.Text = t2 and ("Banned: " .. t2.DisplayName .. " @" .. t2.Name) or ("Banned: " .. prev2)
+	task.spawn(function()
+		local uid = t2 and t2.UserId or (function()
+			local ok, id = pcall(function() return Players:GetUserIdFromNameAsync(prev2) end)
+			return ok and id or nil
+		end)()
+		if uid then
+			local ok2, id2 = pcall(function() return Players:GetUserThumbnailAsync(uid, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48) end)
+			if ok2 then r2b.Image = id2 end
+		end
+	end)
+	local r2d = Instance.new("TextButton", r2a) r2d.Size = UDim2.new(1, 0, 1, 0) r2d.BackgroundTransparency = 1 r2d.Text = "" r2d.ZIndex = 2
+	local copyName = t2 and t2.Name or prev2
+	r2d.MouseButton1Click:Connect(function()
+		setclipboard(copyName) toclipboard(copyName)
+		r2a.BackgroundColor3 = Color3.fromRGB(200, 230, 210) r2a.BackgroundTransparency = 0
+		TS:Create(r2a, TweenInfo.new(0.5, Enum.EasingStyle.Quart), {BackgroundTransparency = 1}):Play()
+	end)
+	TS:Create(r2a, TweenInfo.new(0.5, Enum.EasingStyle.Quart), {BackgroundTransparency = 1}):Play()
+	task.wait() L[17].CanvasPosition = Vector2.new(0, L[17].AbsoluteCanvasSize.Y)
+	L[7].Text = "" L[7].PlaceholderText = (t2 and t2.Name or prev2) .. " was successfully banned!" L[7].BackgroundColor3 = Color3.fromRGB(0, 255, 0) L[8].Text = ""
+	task.wait(1.75) L[7].PlaceholderText = "Target username.." L[7].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 end)
 
 L[11].MouseButton1Click:Connect(function()
