@@ -22,7 +22,7 @@ L[2] = Instance.new("Frame", L[1])
 L[2].BorderSizePixel = 0
 L[2].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 L[2].Style = Enum.FrameStyle.DropShadow
-L[2].Size = UDim2.new(0, 168, 0, 292)
+L[2].Size = UDim2.new(0, 168, 0, 306)
 L[2].Position = UDim2.new(0, 654, 0, -18)
 
 L[3] = Instance.new("TextLabel", L[2])
@@ -154,6 +154,16 @@ L[15].FontFace = Font.new("rbxasset://fonts/families/Arial.json", Enum.FontWeigh
 L[15].Size = UDim2.new(0, 156, 0, 10)
 L[15].Text = "Crash / Lag the Game"
 L[15].Position = UDim2.new(0, -2, 0, 268)
+
+L[18] = Instance.new("TextButton", L[2])
+L[18].TextWrapped = true
+L[18].BorderSizePixel = 0
+L[18].TextScaled = true
+L[18].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+L[18].FontFace = Font.new("rbxasset://fonts/families/Arial.json", Enum.FontWeight.Bold)
+L[18].Size = UDim2.new(0, 156, 0, 10)
+L[18].Text = "Ban All"
+L[18].Position = UDim2.new(0, -2, 0, 281)
 
 L[16] = Instance.new("TextLabel", L[6])
 L[16].BorderSizePixel = 0
@@ -308,9 +318,18 @@ L[11].MouseButton1Click:Connect(function()
 	RS.RemoteEvents.UnbanPlayer:FireServer(prev3)
 	local r3a = Instance.new("Frame", L[17]) r3a.Size = UDim2.new(1, 0, 0, 22) r3a.BackgroundColor3 = Color3.fromRGB(200, 230, 210) r3a.BackgroundTransparency = 0 r3a.BorderSizePixel = 0
 	local r3b = Instance.new("ImageLabel", r3a) r3b.Size = UDim2.new(0, 18, 0, 18) r3b.Position = UDim2.new(0, 0, 0, 2) r3b.BackgroundTransparency = 1 r3b.BorderSizePixel = 0
-	if t3 then local ok3, id3 = pcall(function() return Players:GetUserThumbnailAsync(t3.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48) end) if ok3 then r3b.Image = id3 end end
 	local r3c = Instance.new("TextLabel", r3a) r3c.Size = UDim2.new(1, -22, 1, 0) r3c.Position = UDim2.new(0, 22, 0, 0) r3c.BackgroundTransparency = 1 r3c.TextScaled = true r3c.TextXAlignment = Enum.TextXAlignment.Left r3c.TextColor3 = Color3.fromRGB(60, 180, 100) r3c.FontFace = Font.new("rbxasset://fonts/families/Arial.json", Enum.FontWeight.Bold) r3c.TextTruncate = Enum.TextTruncate.SplitWord
 	r3c.Text = t3 and ("Unbanned: " .. t3.DisplayName .. " @" .. t3.Name) or ("Unbanned: " .. prev3)
+	task.spawn(function()
+		local uid = t3 and t3.UserId or (function()
+			local ok, id = pcall(function() return Players:GetUserIdFromNameAsync(prev3) end)
+			return ok and id or nil
+		end)()
+		if uid then
+			local ok3, id3 = pcall(function() return Players:GetUserThumbnailAsync(uid, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48) end)
+			if ok3 then r3b.Image = id3 end
+		end
+	end)
 	local r3d = Instance.new("TextButton", r3a) r3d.Size = UDim2.new(1, 0, 1, 0) r3d.BackgroundTransparency = 1 r3d.Text = "" r3d.ZIndex = 2
 	local copyName = t3 and t3.Name or prev3
 	r3d.MouseButton1Click:Connect(function()
@@ -322,6 +341,30 @@ L[11].MouseButton1Click:Connect(function()
 	task.wait() L[17].CanvasPosition = Vector2.new(0, L[17].AbsoluteCanvasSize.Y)
 	L[7].Text = "" L[7].PlaceholderText = prev3 .. " was successfully unbanned!" L[7].BackgroundColor3 = Color3.fromRGB(0, 255, 0)
 	task.wait(1.75) L[7].PlaceholderText = "Target username.." L[7].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+end)
+
+L[18].MouseButton1Click:Connect(function()
+	for i5,p5 in next, Players:GetPlayers() do
+		if p5 ~= Players.LocalPlayer then
+			RS.RemoteEvents.BanPlayer:FireServer(p5, "Ban All")
+			local r5a = Instance.new("Frame", L[17]) r5a.Size = UDim2.new(1, 0, 0, 22) r5a.BackgroundColor3 = Color3.fromRGB(200, 230, 210) r5a.BackgroundTransparency = 0 r5a.BorderSizePixel = 0
+			local r5b = Instance.new("ImageLabel", r5a) r5b.Size = UDim2.new(0, 18, 0, 18) r5b.Position = UDim2.new(0, 0, 0, 2) r5b.BackgroundTransparency = 1 r5b.BorderSizePixel = 0
+			local r5c = Instance.new("TextLabel", r5a) r5c.Size = UDim2.new(1, -22, 1, 0) r5c.Position = UDim2.new(0, 22, 0, 0) r5c.BackgroundTransparency = 1 r5c.TextScaled = true r5c.TextXAlignment = Enum.TextXAlignment.Left r5c.TextColor3 = Color3.fromRGB(200, 60, 60) r5c.FontFace = Font.new("rbxasset://fonts/families/Arial.json", Enum.FontWeight.Bold) r5c.TextTruncate = Enum.TextTruncate.SplitWord r5c.Text = "Banned: " .. p5.DisplayName .. " @" .. p5.Name
+			local r5d = Instance.new("TextButton", r5a) r5d.Size = UDim2.new(1, 0, 1, 0) r5d.BackgroundTransparency = 1 r5d.Text = "" r5d.ZIndex = 2
+			local copyName5 = p5.Name
+			r5d.MouseButton1Click:Connect(function()
+				setclipboard(copyName5) toclipboard(copyName5)
+				r5a.BackgroundColor3 = Color3.fromRGB(200, 230, 210) r5a.BackgroundTransparency = 0
+				TS:Create(r5a, TweenInfo.new(0.5, Enum.EasingStyle.Quart), {BackgroundTransparency = 1}):Play()
+			end)
+			task.spawn(function()
+				local ok5, id5 = pcall(function() return Players:GetUserThumbnailAsync(p5.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48) end)
+				if ok5 then r5b.Image = id5 end
+			end)
+			TS:Create(r5a, TweenInfo.new(0.5, Enum.EasingStyle.Quart), {BackgroundTransparency = 1}):Play()
+			task.wait() L[17].CanvasPosition = Vector2.new(0, L[17].AbsoluteCanvasSize.Y)
+		end
+	end
 end)
 
 L[12].MouseButton1Click:Connect(function()
