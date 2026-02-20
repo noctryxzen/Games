@@ -3,8 +3,8 @@ local LocalPlayer = Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Teams = game:GetService("Teams")
 local RunService = game:GetService("RunService")
-getgenv().auto_kill = getgenv().auto_kill or true
-getgenv().auto_obby = getgenv().auto_obby or false
+if getgenv().auto_kill == nil then getgenv().auto_kill = true end
+if getgenv().auto_obby == nil then getgenv().auto_obby = false end
 local ok = false
 
 --// Remove Annoying Screen
@@ -18,6 +18,9 @@ ReplicatedStorage.RagdollRemote.OnClientEvent:Connect(function(P)
 end)
 
 --// Make Mortis
+if getgenv().auto_kill then
+	ReplicatedStorage.Events.GameEvents.MortisChanceEvent:FireServer("PurchaseComplete")
+end
 ReplicatedStorage.Events.GameEvents.RoundStart.OnClientEvent:Connect(function()
 	if not getgenv().auto_kill then return end
 	ReplicatedStorage.Events.GameEvents.MortisChanceEvent:FireServer("PurchaseComplete")
@@ -26,9 +29,6 @@ ReplicatedStorage.Events.GameEvents.VFXEvent.OnClientEvent:Connect(function(Type
 	if Type ~= "TransformVFX" or Target ~= LocalPlayer or LocalPlayer.Team ~= Teams:FindFirstChild("Mortis") then return end
 	ok = true
 end)
-if getgenv().auto_kill then
-	ReplicatedStorage.Events.GameEvents.MortisChanceEvent:FireServer("PurchaseComplete")
-end
 
 --// Obby / Teleport & Hit
 local Part = workspace:FindFirstChild("Lobby") and workspace.Lobby:FindFirstChild("FinishedPart")
