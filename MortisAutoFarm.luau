@@ -1,15 +1,20 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Teams = game:GetService("Teams")
 local RunService = game:GetService("RunService")
-local lp = Players.LocalPlayer
-local Mortis = Teams:FindFirstChild("Mortis")
-local Survivors = Teams:FindFirstChild("Survivors")
-local Spectators = Teams:FindFirstChild("Spectators")
+getgenv().auto_kill = getgenv().auto_kill or true
+getgenv().auto_obby = getgenv().auto_obby or false
+local ok = false
+
+--// Remove Annoying Screen
+if LocalPlayer.PlayerGui:WaitForChild("Transition"):FindFirstChild("Fade") then
+	LocalPlayer.PlayerGui.Transition.Fade:Destroy()
+end
 
 --// Anti Ragdoll
-ReplicatedStorage.RagdollRemote.OnClientEvent:Connect(function(p)
-	if p:find("Enable") then firesignal(ReplicatedStorage.RagdollRemote.OnClientEvent, "Disable") end
+ReplicatedStorage.RagdollRemote.OnClientEvent:Connect(function(P)
+	if P:find("Enable") then firesignal(ReplicatedStorage.RagdollRemote.OnClientEvent, "Disable") end
 end)
 
 --// Lobby
@@ -17,55 +22,48 @@ task.spawn(function()
 	local Part = workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart")
 	while true do
 		task.wait(.1)
-		if lp.Team ~= Spectators then continue end
-		local hrp = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
-		if not hrp then continue end
-		pcall(firetouchinterest, hrp, Part, 0)
+		if not getgenv().auto_obby or LocalPlayer.Team ~= Teams:FindFirstChild("Spectators") then continue end
+		if not (LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")) then continue end
+		pcall(firetouchinterest, LocalPlayer.Character.HumanoidRootPart, Part, 0)
 		task.wait()
-		pcall(firetouchinterest, hrp, Part, 1)
+		pcall(firetouchinterest, LocalPlayer.Character.HumanoidRootPart, Part, 1)
 	end
 end)
 
---// Mortis
+--// Make Mortis
 ReplicatedStorage.Events.GameEvents.MortisChanceEvent:FireServer("PurchaseComplete")
 ReplicatedStorage.Events.GameEvents.RoundStart.OnClientEvent:Connect(function()
 	ReplicatedStorage.Events.GameEvents.MortisChanceEvent:FireServer("PurchaseComplete")
 end)
+ReplicatedStorage.Events.GameEvents.VFXEvent.OnClientEvent:Connect(function(Type, Target)
+	if Type ~= "TransformVFX" or Target ~= LocalPlayer or LocalPlayer.Team ~= Teams:FindFirstChild("Mortis") then return end
+	ok = true
+end)
 
+--// Teleport & Hit
 task.spawn(function()
 	while true do
 		task.wait(.2)
-		if lp.Team ~= Mortis then continue end
-		for i, v in next, Players:GetPlayers() do
-			if v == lp or v.Team ~= Survivors then continue end
-			local hum = v.Character and v.Character:FindFirstChildWhichIsA("Humanoid")
-			if hum and hum.Health > 0 then ReplicatedStorage.Events.GameEvents.HammerSwingEvent:FireServer(v) break end
+		if not getgenv().auto_kill or not ok then continue end
+		for i,v in next, Players:GetPlayers() do
+			if v == LocalPlayer or v.Team ~= Teams:FindFirstChild("Survivors") then continue end
+			if v.Character and v.Character:FindFirstChildWhichIsA("Humanoid") and v.Character:FindFirstChildWhichIsA("Humanoid").Health > 0 then
+				ReplicatedStorage.Events.GameEvents.HammerSwingEvent:FireServer(v) break
+			end
 		end
 	end
 end)
-
---// Teleport
-lp.CharacterAdded:Connect(function(char)
-	char:WaitForChild("HumanoidRootPart")
-	task.wait(1)
-end)
-
-RunService.Heartbeat:Connect(function()
-	if lp.Team ~= Mortis then return end
-	local char = lp.Character
-	if not char then return end
-	local hrp = char:FindFirstChild("HumanoidRootPart")
-	local hum = char:FindFirstChildWhichIsA("Humanoid")
-	if not hrp or not hum or hum.Health <= 0 then return end
-	for i, v in next, Players:GetPlayers() do
-		if v == lp or v.Team ~= Survivors then continue end
-		local vhrp = v.Character and v.Character:FindFirstChild("HumanoidRootPart")
-		local vhum = v.Character and v.Character:FindFirstChildWhichIsA("Humanoid")
-		if vhrp and vhum and vhum.Health > 0 then
-			local Target = vhrp.CFrame * CFrame.new(0, -3, 0)
-			hrp.CFrame = hrp.CFrame:Lerp(Target, .2)
-			break
-		end
+RunService.PreSimulation:Connect(function()
+	if not getgenv().auto_kill or not ok then return end
+	if not (LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")) then return end
+	if LocalPlayer.Team == Teams:FindFirstChild("Spectators") then ok = false return end
+	if not LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Sit then LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Sit = true end
+	for i,v in next, Players:GetPlayers() do
+		if v == LocalPlayer or v.Team ~= Teams:FindFirstChild("Survivors") then continue end
+		if not (v.Character and v.Character:FindFirstChild("HumanoidRootPart")) then continue end
+		if v.Character:FindFirstChildWhichIsA("Humanoid").Health <= 0 then continue end
+		LocalPlayer.Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame * CFrame.new(0, 1.6, 0.4)
+		break
 	end
 end)
 
