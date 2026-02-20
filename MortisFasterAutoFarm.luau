@@ -7,7 +7,7 @@ local GetService = setmetatable({}, {
 local ok = false
 GetService.RunService.PreSimulation:Connect(function()
 	if queue_on_teleport then
-		queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Games/refs/heads/main/MortisInfStuds.luau"))()]])
+		queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Games/refs/heads/main/MortisFasterAutoFarm.luau"))()]])
 	else
 		GetService.StarterGui:SetCore("SendNotification", {
 			Title = "queue_on_teleport not supported",
