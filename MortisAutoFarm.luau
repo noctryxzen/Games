@@ -26,16 +26,14 @@ ReplicatedStorage.RagdollRemote.OnClientEvent:Connect(function(P)
 end)
 
 --// Make Mortis
-if getgenv().auto_kill then
-	ReplicatedStorage.Events.GameEvents.MortisChanceEvent:FireServer("PurchaseComplete")
-end
-ReplicatedStorage.Events.GameEvents.RoundStart.OnClientEvent:Connect(function()
-	if not getgenv().auto_kill then return end
-	ReplicatedStorage.Events.GameEvents.MortisChanceEvent:FireServer("PurchaseComplete")
+local GameEvents = ReplicatedStorage.Events.GameEvents
+if getgenv().auto_kill then GameEvents.MortisChanceEvent:FireServer("PurchaseComplete") end
+GameEvents.RoundStart.OnClientEvent:Connect(function()
+	if getgenv().auto_kill then GameEvents.MortisChanceEvent:FireServer("PurchaseComplete") end
 end)
-ReplicatedStorage.Events.GameEvents.VFXEvent.OnClientEvent:Connect(function(Type, Target)
-	if Type ~= "TransformVFX" or Target ~= LocalPlayer or LocalPlayer.Team ~= Teams:FindFirstChild("Mortis") then return end
-	ok = true
+GameEvents.RoundEnd.OnClientEvent:Connect(function() ok = false end)
+GameEvents.VFXEvent.OnClientEvent:Connect(function(Type, Target)
+	if Type == "TransformVFX" and Target == LocalPlayer and LocalPlayer.Team == Teams:FindFirstChild("Mortis") then ok = true end
 end)
 
 --// Obby / Teleport & Hit
@@ -58,8 +56,8 @@ RunService.PreSimulation:Connect((function()
 			if not (v.Character and v.Character:FindFirstChild("HumanoidRootPart")) then continue end
 			if v.Character:FindFirstChildWhichIsA("Humanoid").Health <= 0 then continue end
 			LocalPlayer.Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame * CFrame.new(0, 1.6, 0.4)
-			if os.clock() - lh >= .2 then
-				ReplicatedStorage.Events.GameEvents.HammerSwingEvent:FireServer(v)
+			if os.clock() - lh >= .1 then
+				GameEvents.HammerSwingEvent:FireServer(v)
 				lh = os.clock()
 			end
 			break
