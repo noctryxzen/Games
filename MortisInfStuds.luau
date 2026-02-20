@@ -1,3 +1,4 @@
+zaten her şey pcall içinde, teleport hatası için sadece onu da pcall içine alalım:
 local GetService = setmetatable({}, {
 	__index = function(s, n)
 		s[n] = (cloneref and (clonefunction and clonefunction(cloneref) or cloneref) or function(x) return x end)((clonefunction and clonefunction(game.GetService) or game.GetService)(game, n))
@@ -22,7 +23,7 @@ GetService.RunService.PreSimulation:Connect(function()
 	local MyRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 	if not MyRoot then return end
 	if ok and LocalPlayer.Team and LocalPlayer.Team.Name == "Spectators" then
-		GetService.TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId)
+		pcall(GetService.TeleportService.TeleportToPlaceInstance, GetService.TeleportService, game.PlaceId, game.JobId)
 		return
 	end
 	pcall(firetouchinterest, MyRoot, workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart"), 0)
