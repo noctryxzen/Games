@@ -18,16 +18,14 @@ ReplicatedStorage.RagdollRemote.OnClientEvent:Connect(function(P)
 end)
 
 --// Lobby
-task.spawn(function()
-	local Part = workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart")
-	while true do
-		task.wait(.1)
-		if not getgenv().auto_obby or LocalPlayer.Team ~= Teams:FindFirstChild("Spectators") then continue end
-		if not (LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")) then continue end
-		pcall(firetouchinterest, LocalPlayer.Character.HumanoidRootPart, Part, 0)
-		task.wait()
-		pcall(firetouchinterest, LocalPlayer.Character.HumanoidRootPart, Part, 1)
-	end
+local Part = workspace:FindFirstChild("Lobby") and workspace.Lobby:FindFirstChild("FinishedPart")
+RunService.PreSimulation:Connect(function()
+	if not getgenv().auto_obby or LocalPlayer.Team ~= Teams:FindFirstChild("Spectators") then return end
+	if not (LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")) then return end
+	if not Part then return end
+	LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0, -99, 0)
+	pcall(firetouchinterest, LocalPlayer.Character.HumanoidRootPart, Part, 0)
+	pcall(firetouchinterest, LocalPlayer.Character.HumanoidRootPart, Part, 1)
 end)
 
 --// Make Mortis
