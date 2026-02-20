@@ -4,7 +4,6 @@ local GetService = setmetatable({}, {
 		return s[n]
 	end
 })
-loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Games/refs/heads/main/MortisInfStuds.luau"))()
 queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Games/refs/heads/main/MortisInfStuds.luau"))()]])
 local Team = GetService.Players.LocalPlayer.Team
 if Team and (Team.Name == "Survivors" or Team.Name == "Mortis") then
