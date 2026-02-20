@@ -1,3 +1,4 @@
+queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Games/refs/heads/main/MortisInfStuds.luau"))()]])
 game:GetService("Players").LocalPlayer.OnTeleport:Connect(function(State)
 	if State == Enum.TeleportState.Failed then
 		game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId)
