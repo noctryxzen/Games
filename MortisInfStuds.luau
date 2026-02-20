@@ -18,8 +18,8 @@ GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Conn
 end)
 GetService.RunService.PreSimulation:Connect(function()
 	if ok then return end
-	local Root = GetService.Players.LocalPlayer.Character and GetService.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-	if not Root then return end
-	pcall(firetouchinterest, Root, workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart"), 0)
-	pcall(firetouchinterest, Root, workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart"), 1)
+	local MyRoot = GetService.Players.LocalPlayer.Character and GetService.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+	if not MyRoot then return end
+	pcall(firetouchinterest, MyRoot, workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart"), 0)
+	pcall(firetouchinterest, MyRoot, workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart"), 1)
 end)
