@@ -1,11 +1,21 @@
-queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Games/refs/heads/main/MortisInfStuds.luau"))()]])
-
-game:GetService("RunService").PreSimulation:Connect(function()
-	local Char = game:GetService("Players").LocalPlayer.Character
-	if not Char or not Char:FindFirstChild("HumanoidRootPart") then
-		game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, game:GetService("Players").LocalPlayer)
-		return
+local GetService = setmetatable({}, {
+	__index = function(s, n)
+		s[n] = (cloneref and (clonefunction and clonefunction(cloneref) or cloneref) or function(x) return x end)((clonefunction and clonefunction(game.GetService) or game.GetService)(game, n))
+		return s[n]
 	end
-	pcall(firetouchinterest, Char.HumanoidRootPart, workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart"), 0)
-	pcall(firetouchinterest, Char.HumanoidRootPart, workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart"), 1)
+})
+queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Games/refs/heads/main/MortisInfStuds.luau"))()]])
+local ok = false
+GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Connect(function(got)
+	if got == "Obby Complete: +15 Studs" then
+		ok = true
+		GetService.TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId)
+	end
+end)
+GetService.RunService.PreSimulation:Connect(function()
+	if ok then return end
+	local Root = GetService.Players.LocalPlayer.Character and GetService.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+	if not Root then return end
+	pcall(firetouchinterest, Root, workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart"), 0)
+	pcall(firetouchinterest, Root, workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart"), 1)
 end)
