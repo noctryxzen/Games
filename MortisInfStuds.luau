@@ -4,7 +4,15 @@ local GetService = setmetatable({}, {
 		return s[n]
 	end
 })
-queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Games/refs/heads/main/MortisInfStuds.luau"))()]])
+if queue_on_teleport then
+	queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Games/refs/heads/main/MortisInfStuds.luau"))()]])
+else
+	GetService.StarterGui:SetCore("SendNotification", {
+		Title = "queue_on_teleport not supported",
+		Text = "Please put the loadstring to your autoexec!",
+		Duration = 5
+	})
+end
 local Team = GetService.Players.LocalPlayer.Team
 if Team and (Team.Name == "Survivors" or Team.Name == "Mortis") then
 	GetService.TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId)
