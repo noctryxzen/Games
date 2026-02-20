@@ -1,8 +1,16 @@
-local Players = game:GetService("Players")
+local GetService = setmetatable({}, {
+	__index = function(S, N)
+		S[N] = (cloneref and clonefunction(cloneref) or function(X) return X end)(clonefunction(game.GetService)(game, N))
+		return S[N]
+	end
+})
+
+local Players = GetService.Players
 local LocalPlayer = Players.LocalPlayer
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Teams = game:GetService("Teams")
-local RunService = game:GetService("RunService")
+local ReplicatedStorage = GetService.ReplicatedStorage
+local Teams = GetService.Teams
+local RunService = GetService.RunService
+local Workspace = GetService.Workspace
 if getgenv().auto_kill == nil then getgenv().auto_kill = true end
 if getgenv().auto_obby == nil then getgenv().auto_obby = false end
 local ok = false
@@ -31,7 +39,7 @@ ReplicatedStorage.Events.GameEvents.VFXEvent.OnClientEvent:Connect(function(Type
 end)
 
 --// Obby / Teleport & Hit
-local Part = workspace:FindFirstChild("Lobby") and workspace.Lobby:FindFirstChild("FinishedPart")
+local Part = Workspace:FindFirstChild("Lobby") and Workspace.Lobby:FindFirstChild("FinishedPart")
 RunService.PreSimulation:Connect((function()
 	local lh = 0
 	return function()
@@ -58,5 +66,4 @@ RunService.PreSimulation:Connect((function()
 		end
 	end
 end)())
-
 warn("ok")
