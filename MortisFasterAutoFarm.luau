@@ -25,6 +25,6 @@ GetService.RunService.PreSimulation:Connect(function()
 	local LocalPlayer = GetService.Players.LocalPlayer
 	local MyRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 	if not MyRoot then return end
-	pcall(firetouchinterest, MyRoot, workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart"), 0)
-	pcall(firetouchinterest, MyRoot, workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart"), 1)
+	pcall(firetouchinterest, MyRoot, GetService.Workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart"), 0)
+	pcall(firetouchinterest, MyRoot, GetService.Workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart"), 1)
 end)
