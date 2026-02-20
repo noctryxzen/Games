@@ -37,7 +37,7 @@ RunService.PreSimulation:Connect((function()
 	return function()
 		if not (LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")) then return end
 		if getgenv().auto_obby and LocalPlayer.Team == Teams:FindFirstChild("Spectators") and not LocalPlayer:GetAttribute("IsGhost") and Part then
-			LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0, -10, 0)
+			LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(16, 36, 982)
 			pcall(firetouchinterest, LocalPlayer.Character.HumanoidRootPart, Part, 0)
 			pcall(firetouchinterest, LocalPlayer.Character.HumanoidRootPart, Part, 1)
 			return
