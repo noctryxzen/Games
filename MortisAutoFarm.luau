@@ -1,67 +1,61 @@
 local GetService = setmetatable({}, {
-	__index = function(S, N)
-		S[N] = (cloneref and clonefunction(cloneref) or function(X) return X end)(clonefunction(game.GetService)(game, N))
-		return S[N]
+	__index = function(s, n)
+		s[n] = (cloneref and clonefunction(cloneref) or function(x) return x end)(clonefunction(game.GetService)(game, n))
+		return s[n]
 	end
 })
 
-local Players = GetService.Players
-local LocalPlayer = Players.LocalPlayer
-local ReplicatedStorage = GetService.ReplicatedStorage
-local Teams = GetService.Teams
-local RunService = GetService.RunService
-local Workspace = GetService.Workspace
 if getgenv().auto_kill == nil then getgenv().auto_kill = true end
 if getgenv().auto_obby == nil then getgenv().auto_obby = false end
 local ok = false
 
 --// Remove Annoying Screen
-if LocalPlayer.PlayerGui:WaitForChild("Transition"):FindFirstChild("Fade") then
-	LocalPlayer.PlayerGui.Transition.Fade:Destroy()
+if GetService.Players.LocalPlayer.PlayerGui:WaitForChild("Transition"):FindFirstChild("Fade") then
+	GetService.Players.LocalPlayer.PlayerGui.Transition.Fade:Destroy()
 end
 
 --// Anti Ragdoll
-ReplicatedStorage.RagdollRemote.OnClientEvent:Connect(function(P)
-	if P:find("Enable") then firesignal(ReplicatedStorage.RagdollRemote.OnClientEvent, "Disable") end
-end)
+GetService.ReplicatedStorage.RagdollRemote.OnClientEvent:Connect(newcclosure(function(P)
+	if P:find("Enable") then firesignal(GetService.ReplicatedStorage.RagdollRemote.OnClientEvent, "Disable") end
+end))
 
---// Make Mortis
-local GameEvents = ReplicatedStorage.Events.GameEvents
+--// Make Me Mortis
+local GameEvents = GetService.ReplicatedStorage.Events.GameEvents
 if getgenv().auto_kill then GameEvents.MortisChanceEvent:FireServer("PurchaseComplete") end
-GameEvents.RoundStart.OnClientEvent:Connect(function()
+GameEvents.RoundStart.OnClientEvent:Connect(newcclosure(function()
 	if getgenv().auto_kill then GameEvents.MortisChanceEvent:FireServer("PurchaseComplete") end
-end)
-GameEvents.RoundEnd.OnClientEvent:Connect(function() ok = false end)
-GameEvents.VFXEvent.OnClientEvent:Connect(function(Type, Target)
-	if Type == "TransformVFX" and Target == LocalPlayer and LocalPlayer.Team == Teams:FindFirstChild("Mortis") then ok = true end
-end)
+end))
+GameEvents.RoundEnd.OnClientEvent:Connect(newcclosure(function() ok = false end))
+GameEvents.VFXEvent.OnClientEvent:Connect(newcclosure(function(Type, Target)
+	if Type == "TransformVFX" and Target == GetService.Players.LocalPlayer and GetService.Players.LocalPlayer.Team == GetService.Teams:FindFirstChild("Mortis") then ok = true end
+end))
 
 --// Obby / Teleport & Hit
-local Part = Workspace:FindFirstChild("Lobby") and Workspace.Lobby:FindFirstChild("FinishedPart")
-RunService.PreSimulation:Connect((function()
+local Part = GetService.Workspace:FindFirstChild("Lobby") and GetService.Workspace.Lobby:FindFirstChild("FinishedPart")
+GetService.RunService.PreSimulation:Connect((function()
 	local lh = 0
-	return function()
-		if not (LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")) then return end
-		if getgenv().auto_obby and LocalPlayer.Team == Teams:FindFirstChild("Spectators") and not LocalPlayer:GetAttribute("IsGhost") and Part then
-			LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(16, 36, 982)
-			pcall(firetouchinterest, LocalPlayer.Character.HumanoidRootPart, Part, 0)
-			pcall(firetouchinterest, LocalPlayer.Character.HumanoidRootPart, Part, 1)
+	return newcclosure(function()
+		if not (GetService.Players.LocalPlayer.Character and GetService.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")) then return end
+		if getgenv().auto_obby and GetService.Players.LocalPlayer.Team == GetService.Teams:FindFirstChild("Spectators") and not GetService.Players.LocalPlayer:GetAttribute("IsGhost") and Part then
+			GetService.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(16, 36, 982)
+			pcall(firetouchinterest, GetService.Players.LocalPlayer.Character.HumanoidRootPart, Part, 0)
+			pcall(firetouchinterest, GetService.Players.LocalPlayer.Character.HumanoidRootPart, Part, 1)
 			return
 		end
 		if not getgenv().auto_kill or not ok then return end
-		if LocalPlayer.Team == Teams:FindFirstChild("Spectators") then ok = false return end
-		if not LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Sit then LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Sit = true end
-		for i,v in next, Players:GetPlayers() do
-			if v == LocalPlayer or v.Team ~= Teams:FindFirstChild("Survivors") then continue end
+		if GetService.Players.LocalPlayer.Team == GetService.Teams:FindFirstChild("Spectators") then ok = false return end
+		if not GetService.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Sit then GetService.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Sit = true end
+		for i,v in next, GetService.Players:GetPlayers() do
+			if v == GetService.Players.LocalPlayer or v.Team ~= GetService.Teams:FindFirstChild("Survivors") then continue end
 			if not (v.Character and v.Character:FindFirstChild("HumanoidRootPart")) then continue end
 			if v.Character:FindFirstChildWhichIsA("Humanoid").Health <= 0 then continue end
-			LocalPlayer.Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame * CFrame.new(0, 1.6, 0.4)
+			GetService.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame * CFrame.new(0, 1.6, 0.4)
 			if os.clock() - lh >= .1 then
 				GameEvents.HammerSwingEvent:FireServer(v)
 				lh = os.clock()
 			end
 			break
 		end
-	end
+	end)
 end)())
 warn("ok")
