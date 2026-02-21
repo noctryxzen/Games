@@ -58,6 +58,7 @@ L[6].TextScaled = true
 L[6].FontFace = Font.new("rbxasset://fonts/families/Arial.json", Enum.FontWeight.Bold)
 L[6].Size = UDim2.new(0, 162, 0, 10)
 L[6].Text = "Auto Give Bomb"
+L[6].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 L[6].Position = UDim2.new(0, -2, 0, 244)
 
 L[7] = Instance.new("TextButton", L[2])
@@ -66,6 +67,7 @@ L[7].TextScaled = true
 L[7].FontFace = Font.new("rbxasset://fonts/families/Arial.json", Enum.FontWeight.Bold)
 L[7].Size = UDim2.new(0, 162, 0, 10)
 L[7].Text = "Auto Grab Bomb"
+L[7].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 L[7].Position = UDim2.new(0, -2, 0, 232)
 
 L[8] = Instance.new("ScrollingFrame", L[2])
