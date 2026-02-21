@@ -15,8 +15,8 @@ else
 end
 
 local ok, crate = false, not getgenv().autobuy
-local cratee, teleportig = false, false
 
+local cratee, teleportig = false, false
 --// Disable Log-Service
 if getconnections then
 	for i, v in next, getconnections(GetService.LogService.MessageOut) do v:Disable() end
@@ -28,7 +28,6 @@ GetService.ReplicatedStorage.Events.GameEvents.ShopEvent.OnClientEvent:Connect(f
 		writefile("wantedcrate.json", data.crateName:gsub("Crate", ""))
 	end
 end)
-
 GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Connect(function(got)
 	if got then
 		ok = true
@@ -46,14 +45,12 @@ GetService.RunService.PreSimulation:Connect(function()
 			task.delay(2, function() crate = true end)
 		end
 	end
-
 	if not teleportig then
 		teleportig = true
 		task.delay(1, function()
 			if not ok then GetService.TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId) end
 		end)
 	end
-
 	if ok or not crate then return end
 	local MyRoot = GetService.Players.LocalPlayer.Character and GetService.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 	if not MyRoot then return end
