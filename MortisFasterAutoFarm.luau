@@ -13,11 +13,6 @@ else
 		Duration = 5
 	})
 end
-local LocalPlayer = GetService.Players.LocalPlayer
-local Team = LocalPlayer.Team
-if Team and (Team.Name == "Survivors" or Team.Name == "Mortis" or (Team.Name == "Spectators" and LocalPlayer:GetAttribute("IsGhost"))) then
-	GetService.TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId)
-end
 local ok = false
 GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Connect(function(got)
 	if got == "Obby Complete: +15 Studs" then
@@ -25,9 +20,12 @@ GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Conn
 		GetService.TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId)
 	end
 end)
+task.delay(1, function()
+	if not ok then GetService.TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId) end
+end)
 GetService.RunService.PreSimulation:Connect(function()
 	if ok then return end
-	local MyRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+	local MyRoot = GetService.Players.LocalPlayer.Character and GetService.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 	if not MyRoot then return end
 	pcall(firetouchinterest, MyRoot, GetService.Workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart"), 0)
 	pcall(firetouchinterest, MyRoot, GetService.Workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart"), 1)
