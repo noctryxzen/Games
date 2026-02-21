@@ -1,6 +1,6 @@
 local GetService = setmetatable({}, {
 	__index = function(s, n)
-		s[n] = (cloneref and (clonefunction and clonefunction(cloneref) or cloneref) or function(x) return x end)((clonefunction and clonefunction(game.GetService) or game.GetService)(game, n))
+		s[n] = (cloneref and clonefunction(cloneref) or function(x) return x end)(clonefunction(game.GetService)(game, n))
 		return s[n]
 	end
 })
@@ -41,10 +41,12 @@ task.delay(1, function()
 end)
 
 --// Main
+local FinishedPart = GetService.Workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart")
 GetService.RunService.PreSimulation:Connect(function()
 	if ok or not crate then return end
 	local MyRoot = GetService.Players.LocalPlayer.Character and GetService.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 	if not MyRoot then return end
-	pcall(firetouchinterest, MyRoot, GetService.Workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart"), 0)
-	pcall(firetouchinterest, MyRoot, GetService.Workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart"), 1)
+	MyRoot.CFrame = CFrame.new(16, 36, 982)
+	pcall(firetouchinterest, MyRoot, FinishedPart, 0)
+	pcall(firetouchinterest, MyRoot, FinishedPart, 1)
 end)
