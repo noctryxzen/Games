@@ -6,7 +6,8 @@ local GetService = setmetatable({}, {
 })
 
 --// Auto-Buy
-if getgenv().autobuy == nil then getgenv().autobuy = isfile("wantedcrate.json") and readfile("wantedcrate.json") or false end
+if getgenv().auto_buy == nil then getgenv().auto_buy = isfile("wantedcrate.json") and readfile("wantedcrate.json") or false end
+
 if queue_on_teleport then
 	queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Games/refs/heads/main/MortisFasterAutoFarm.luau"))()]])
 else
@@ -17,25 +18,27 @@ else
 	})
 end
 
-local ok, crate = false, not getgenv().autobuy
+local ok, crate = false, not getgenv().auto_buy
 
-if getgenv().autobuy then
+if getgenv().auto_buy then
 	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent.OnClientEvent:Connect(function(got, data)
 		if got == "CrateResult" then
 			crate = true
 			writefile("wantedcrate.json", data.crateName:gsub("Crate", ""))
 		end
 	end)
-	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("BuyCrate", {crateName = getgenv().autobuy .. "Crate"})
+	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("BuyCrate", {crateName = getgenv().auto_buy .. "Crate"})
 	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("ClaimReward")
 	task.delay(2, function() crate = true end)
 end
+
 GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Connect(function(got)
 	if got then
 		ok = true
 		GetService.TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId)
 	end
 end)
+
 task.delay(1, function()
 	if not ok then GetService.TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId) end
 end)
