@@ -54,10 +54,12 @@ function Auto.Block() -- yeah sorry for leaking it
 		return ___
 	end
 	for i, v in ____ do
-		if v ~= GetService.Players.LocalPlayer and _______ < 2 then
+		if v ~= GetService.Players.LocalPlayer and _______ < 1 then
 			GetService.StarterGui:SetCore("PromptBlockPlayer", v)
 			task.wait(2)
-			local ______ = GetService.CoreGui:WaitForChild("BlockingModalScreen").BlockingModalContainer.BlockingModalContainerWrapper.BlockingModal.AlertModal.AlertContents.Footer.Buttons["3"]
+			local ______ = GetService.CoreGui:FindFirstChild("BlockingModalScreen")
+			if not ______ then continue end
+			______ = ______.BlockingModalContainer.BlockingModalContainerWrapper.BlockingModal.AlertModal.AlertContents.Footer.Buttons["3"]
 			GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, true, game, 0)
 			GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, false, game, 0)
 			task.wait(.5)
