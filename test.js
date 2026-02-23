@@ -57,24 +57,22 @@ function Auto.Block()
 	end
 	local ____ = GetService.Players:GetPlayers()
 	if #____ == 1 and ____[1] == GetService.Players.LocalPlayer then
-		if not ___[Job] then ___[Job] = "" end
+		___[Job] = "yes"
 		local ________ = {}
-		for i, v3 in ___ do if v3 ~= "" then table.insert(________, i .. "=" .. v3) end end
+		for i, v3 in ___ do table.insert(________, i .. "=" .. v3) end
 		writefile("autotp.txt", table.concat(________, "\n"))
 		return ___
 	end
 	for _, v in ____ do
-		if v ~= GetService.Players.LocalPlayer then
-			if not Auto.IsBlocked(v) then
-				GetService.StarterGui:SetCore("PromptBlockPlayer", v)
-				local _____ = 0
-				repeat task.wait(0.1) _____ += 0.1 until Auto.IsBlocked(v) or _____ >= 10
-			end
-			___[Job] = ___[Job] and ___[Job] .. "," .. v.Name or v.Name
+		if v ~= GetService.Players.LocalPlayer and not Auto.IsBlocked(v) then
+			GetService.StarterGui:SetCore("PromptBlockPlayer", v)
+			local _____ = 0
+			repeat task.wait(0.1) _____ += 0.1 until Auto.IsBlocked(v) or _____ >= 10
 		end
 	end
+	___[Job] = "yes"
 	local ________ = {}
-	for i, v3 in ___ do if v3 ~= "" then table.insert(________, i .. "=" .. v3) end end
+	for i, v3 in ___ do table.insert(________, i .. "=" .. v3) end
 	writefile("autotp.txt", table.concat(________, "\n"))
 	return ___
 end
