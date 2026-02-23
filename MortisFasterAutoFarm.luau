@@ -36,7 +36,11 @@ end
 local Auto = {}
 local Game, Job = game.PlaceId, game.JobId
 function Auto.Teleport(Game, Job, NextServer)
-	GetService.TeleportService:TeleportToPlaceInstance(Game, NextServer or Job)
+	if NextServer then
+		GetService.TeleportService:TeleportToPlaceInstance(Game, NextServer)
+	else
+		GetService.TeleportService:Teleport(Game)
+	end
 end
 function Auto.Block() -- yeah sorry for leaking it
 	if not (getgenv().create_new_server or isfile("autotp.txt")) then return end
@@ -44,7 +48,6 @@ function Auto.Block() -- yeah sorry for leaking it
 	if isfile("autotp.txt") then
 		for i, v3 in readfile("autotp.txt"):gmatch("(.-)=(.+)") do ___[i] = v3 end
 	end
-	local _______ = 0
 	local ____ = GetService.Players:GetPlayers()
 	if #____ == 1 and ____[1] == GetService.Players.LocalPlayer then
 		if not ___[Job] then ___[Job] = "" end
@@ -53,6 +56,7 @@ function Auto.Block() -- yeah sorry for leaking it
 		writefile("autotp.txt", table.concat(________, "\n"))
 		return ___
 	end
+	local _______ = 0
 	for i, v in ____ do
 		if v ~= GetService.Players.LocalPlayer and _______ < 1 then
 			GetService.StarterGui:SetCore("PromptBlockPlayer", v)
@@ -79,8 +83,12 @@ if ___ then
 	local Server1 = GetService.HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. Game .. "/servers/Public?sortOrder=Asc&limit=100&excludeFullGames=true"))
 	local Server2 = GetService.HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. Game .. "/servers/Public?sortOrder=Asc&limit=100&excludeFullGames=true&cursor=" .. (Server1.nextPageCursor or "")))
 	local _________ = {}
-	for i, v2 in Server1.data do table.insert(_________, v2) end
-	for i, v2 in Server2.data do table.insert(_________, v2) end
+	for i, v2 in Server1.data do
+		if v2.playing < v2.maxPlayers then table.insert(_________, v2) end
+	end
+	for i, v2 in Server2.data do
+		if v2.playing < v2.maxPlayers then table.insert(_________, v2) end
+	end
 
 	local __________ = nil
 	for i, v2 in _________ do
@@ -90,19 +98,49 @@ if ___ then
 		end
 	end
 
-	Auto.Teleport(Game, Job, __________)
+	if __________ then
+		Auto.Teleport(Game, Job, __________)
+	else
+		Auto.Teleport(Game)
+	end
 end
 
 --// Main
 GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Connect(function(got)
 	if got then
 		_ = true
-		Auto.Block()
-		Auto.Teleport(Game, Job)
+		local ___ = Auto.Block()
+		if ___ then
+			local Server1 = GetService.HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. Game .. "/servers/Public?sortOrder=Asc&limit=100&excludeFullGames=true"))
+			local Server2 = GetService.HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. Game .. "/servers/Public?sortOrder=Asc&limit=100&excludeFullGames=true&cursor=" .. (Server1.nextPageCursor or "")))
+			local _________ = {}
+			for i, v2 in Server1.data do
+				if v2.playing < v2.maxPlayers then table.insert(_________, v2) end
+			end
+			for i, v2 in Server2.data do
+				if v2.playing < v2.maxPlayers then table.insert(_________, v2) end
+			end
+
+			local __________ = nil
+			for i, v2 in _________ do
+				if not ___[v2.id] then
+					__________ = v2.id
+					break
+				end
+			end
+
+			if __________ then
+				Auto.Teleport(Game, Job, __________)
+			else
+				Auto.Teleport(Game)
+			end
+		else
+			Auto.Teleport(Game, Job, Job)
+		end
 	end
 end)
 task.delay(1, function()
-	if not _ then Auto.Teleport(Game, Job) end
+	if not _ then Auto.Teleport(Game, Job, Job) end
 end)
 
 local FinishedPart = GetService.Workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart")
