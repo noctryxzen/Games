@@ -15,7 +15,11 @@ end
 --// Teleporter & Blocker to avoid Reports
 local Auto = {}
 local Game, Job = game.PlaceId, game.JobId
+local IsTeleporting = false
 function Auto.Teleport(Game, Job, NextServer)
+	if IsTeleporting then return end
+	IsTeleporting = true
+	task.wait(.5)
 	if NextServer then GetService.TeleportService:TeleportToPlaceInstance(Game, NextServer)
 	else GetService.TeleportService:Teleport(Game) end
 end
@@ -94,9 +98,29 @@ function Auto.Block() --// sorry for leaking it 😓😭
 	return nil
 end
 
---// Main
+--// Block Players & Teleport to Block Others
+local ___ = Auto.Block()
+if ___ then
+	local _______ = Auto.Servers()
+	local __________ = nil
+	for i, v in next, _______ do if not ___[v] then __________ = v break end end
+	if __________ then Auto.Teleport(Game, Job, __________) else Auto.Teleport(Game) end
+end
+
+--// Auto-Buy
 local _ = false
-local FinishedPart = GetService.Workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart")
+local __ = not (getgenv().auto_buy or isfile("wantedcrate.json"))
+if getgenv().auto_buy or isfile("wantedcrate.json") then
+	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent.OnClientEvent:Connect(function(got, data)
+		if got == "CrateResult" then __ = true writefile("wantedcrate.json", data.crateName:gsub("Crate", "")) end
+	end)
+	task.wait(.3)
+	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("BuyCrate", {crateName = (getgenv().auto_buy or readfile("wantedcrate.json")) .. "Crate"})
+	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("ClaimReward")
+	task.delay(2, function() __ = true end)
+end
+
+--// Main
 GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Connect(function(got)
 	if got then
 		_ = true
@@ -111,37 +135,14 @@ GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Conn
 		end
 	end
 end)
+task.delay(1, function()
+	if not _ then Auto.Teleport(Game, Job, Job) end
+end)
+local FinishedPart = GetService.Workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart")
 GetService.RunService.PreSimulation:Connect(function()
-	if _ then return end
+	if _ or not __ then return end
 	local MyRoot = GetService.Players.LocalPlayer.Character and GetService.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 	if not MyRoot then return end
 	pcall(firetouchinterest, MyRoot, FinishedPart, 0)
 	pcall(firetouchinterest, MyRoot, FinishedPart, 1)
 end)
-
---// Auto-Buy
-local __ = not (getgenv().auto_buy or isfile("wantedcrate.json"))
-if getgenv().auto_buy or isfile("wantedcrate.json") then
-	__ = false
-	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent.OnClientEvent:Connect(function(got, data)
-		if got == "CrateResult" then __ = true writefile("wantedcrate.json", data.crateName:gsub("Crate", "")) end
-	end)
-	task.wait(.1)
-	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("BuyCrate", {crateName = (getgenv().auto_buy or readfile("wantedcrate.json")) .. "Crate"})
-	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("ClaimReward")
-	task.delay(1, function() __ = true end)
-	repeat task.wait(.1) until __
-end
-
---// Block Players & Teleport to Block Others
-local ___ = Auto.Block()
-if ___ then
-	local _______ = Auto.Servers()
-	local __________ = nil
-	for i, v in next, _______ do if not ___[v] then __________ = v break end end
-	if __________ then Auto.Teleport(Game, Job, __________) else Auto.Teleport(Game) end
-else
-	task.delay(.5, function()
-		if not _ then Auto.Teleport(Game, Job, Job) end
-	end)
-end
