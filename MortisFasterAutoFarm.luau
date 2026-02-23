@@ -40,28 +40,29 @@ function Auto.Teleport(Game, Job, NextServer)
 end
 function Auto.Block() -- yeah sorry for leaking it
 	if not getgenv().create_new_server then return end
-	local ___ = isfile("autotp.json") and GetService.HttpService:JSONDecode(readfile("autotp.json")) or {}
-	local ____ = GetService.Players:GetPlayers()
-	local _____ = #____ == 1 and ____[1] == GetService.Players.LocalPlayer
-	if not _____ then
-		local ______ = {}
-		local _______ = 0
+	local ___ = {}
+	if isfile("autotp.txt") then
+		for i, v3 in readfile("autotp.txt"):gmatch("(.-)=(.+)") do ___[i] = v3 end
+	end
+	while true do
+		local ____ = GetService.Players:GetPlayers()
+		local _____ = #____ == 1 and ____[1] == GetService.Players.LocalPlayer
+		if _____ then break end
 		for i, v in ____ do
-			if v ~= GetService.Players.LocalPlayer and _______ < 2 then
+			if v ~= GetService.Players.LocalPlayer then
 				GetService.StarterGui:SetCore("PromptBlockPlayer", v)
-				local ________ = GetService.CoreGui:FindFirstChild("BlockingModalScreen") or GetService.CoreGui:WaitForChild("BlockingModalScreen", 5)
-				if not ________ then continue end
-				task.wait(2)
-				local _________ = ________.BlockingModalContainer.BlockingModalContainerWrapper.BlockingModal.AlertModal.AlertContents.Footer.Buttons["3"]
-				GetService.VirtualInputManager:SendMouseButtonEvent(_________.AbsolutePosition.X + _________.AbsoluteSize.X / 2, _________.AbsolutePosition.Y + _________.AbsoluteSize.Y / 2 + 42, 0, true, game, 0)
-				GetService.VirtualInputManager:SendMouseButtonEvent(_________.AbsolutePosition.X + _________.AbsoluteSize.X / 2, _________.AbsolutePosition.Y + _________.AbsoluteSize.Y / 2 + 42, 0, false, game, 0)
-				task.wait(2)
-				table.insert(______, v.Name)
-				_______ += 1
+				task.wait(.5)
+				local ______ = GetService.CoreGui:WaitForChild("BlockingModalScreen").BlockingModalContainer.BlockingModalContainerWrapper.BlockingModal.AlertModal.AlertContents.Footer.Buttons["3"]
+				GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, true, game, 0)
+				GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, false, game, 0)
+				task.wait(.5)
+				___[Job] = ___[Job] and ___[Job] .. "," .. v.Name or v.Name
+				local _______ = {}
+				for i, v3 in ___ do table.insert(_______, i .. "=" .. v3) end
+				writefile("autotp.txt", table.concat(_______, "\n"))
 			end
 		end
-		___[Job] = table.concat(______, ",")
-		writefile("autotp.json", GetService.HttpService:JSONEncode(___))
+		task.wait(1)
 	end
 	return ___
 end
