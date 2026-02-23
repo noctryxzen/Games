@@ -37,7 +37,7 @@ function Auto.IsBlocked(v)
 	end
 	return true
 end
-function Auto.Block() --// sorry for leaking it 😓😭
+function Auto.Block() --// sorry for leaking it 😓😭 *burps*
 	if not getgenv().create_new_server and not isfile("autotp.json") then return nil end
 	local ___ = {}
 	if isfile("autotp.json") then
@@ -119,15 +119,16 @@ GetService.RunService.PreSimulation:Connect(function()
 end)
 
 --// Auto-Buy
+local __ = not (getgenv().auto_buy or isfile("wantedcrate.json"))
 if getgenv().auto_buy or isfile("wantedcrate.json") then
-	local __ = false
+	__ = false
 	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent.OnClientEvent:Connect(function(got, data)
 		if got == "CrateResult" then __ = true writefile("wantedcrate.json", data.crateName:gsub("Crate", "")) end
 	end)
-	task.wait(.3)
+	task.wait(.1)
 	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("BuyCrate", {crateName = (getgenv().auto_buy or readfile("wantedcrate.json")) .. "Crate"})
 	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("ClaimReward")
-	task.delay(2, function() __ = true end)
+	task.delay(1, function() __ = true end)
 	repeat task.wait(.1) until __
 end
 
@@ -139,7 +140,7 @@ if ___ then
 	for i, v in next, _______ do if not ___[v] then __________ = v break end end
 	if __________ then Auto.Teleport(Game, Job, __________) else Auto.Teleport(Game) end
 else
-	task.delay(1, function()
+	task.delay(.5, function()
 		if not _ then Auto.Teleport(Game, Job, Job) end
 	end)
 end
