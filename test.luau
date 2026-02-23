@@ -5,7 +5,7 @@ local GetService = setmetatable({}, {
 	end
 })
 
---// Re-Execute the script for the next Teleport
+--// Re-Execute the Script for Next Teleport
 if queue_on_teleport then
 	queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Games/refs/heads/main/test.luau"))()]])
 else
