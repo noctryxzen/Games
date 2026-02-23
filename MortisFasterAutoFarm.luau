@@ -38,32 +38,39 @@ local Game, Job = game.PlaceId, game.JobId
 function Auto.Teleport(Game, Job, NextServer)
 	GetService.TeleportService:TeleportToPlaceInstance(Game, NextServer or Job)
 end
+function Auto.BlockPlayer(v)
+	GetService.StarterGui:SetCore("PromptBlockPlayer", v)
+	task.wait(.5)
+	local ______ = GetService.CoreGui:WaitForChild("BlockingModalScreen")
+		:WaitForChild("BlockingModalContainer")
+		:WaitForChild("BlockingModalContainerWrapper")
+		:WaitForChild("BlockingModal")
+		:WaitForChild("AlertModal")
+		:WaitForChild("AlertContents")
+		:WaitForChild("Footer")
+		:WaitForChild("Buttons")
+		:WaitForChild("3")
+	GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, true, game, 0)
+	GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, false, game, 0)
+	task.wait(.5)
+end
 function Auto.Block() -- yeah sorry for leaking it
 	if not getgenv().create_new_server then return end
 	local ___ = {}
 	if isfile("autotp.txt") then
 		for i, v3 in readfile("autotp.txt"):gmatch("(.-)=(.+)") do ___[i] = v3 end
 	end
-	while true do
-		local ____ = GetService.Players:GetPlayers()
-		local _____ = #____ == 1 and ____[1] == GetService.Players.LocalPlayer
-		if _____ then break end
-		for i, v in ____ do
-			if v ~= GetService.Players.LocalPlayer then
-				GetService.StarterGui:SetCore("PromptBlockPlayer", v)
-				task.wait(.5)
-				local ______ = GetService.CoreGui:WaitForChild("BlockingModalScreen").BlockingModalContainer.BlockingModalContainerWrapper.BlockingModal.AlertModal.AlertContents.Footer.Buttons["3"]
-				GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, true, game, 0)
-				GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, false, game, 0)
-				task.wait(.5)
-				___[Job] = ___[Job] and ___[Job] .. "," .. v.Name or v.Name
-				local _______ = {}
-				for i, v3 in ___ do table.insert(_______, i .. "=" .. v3) end
-				writefile("autotp.txt", table.concat(_______, "\n"))
-			end
+	local _______ = 0
+	for i, v in GetService.Players:GetPlayers() do
+		if v ~= GetService.Players.LocalPlayer and _______ < 2 then
+			Auto.BlockPlayer(v)
+			___[Job] = ___[Job] and ___[Job] .. "," .. v.Name or v.Name
+			_______ += 1
 		end
-		task.wait(1)
 	end
+	local ________ = {}
+	for i, v3 in ___ do table.insert(________, i .. "=" .. v3) end
+	writefile("autotp.txt", table.concat(________, "\n"))
 	return ___
 end
 
