@@ -32,7 +32,7 @@ if getgenv().auto_buy then
 	task.delay(2, function() __ = true end)
 end
 
---// Teleporter
+--// Teleporter & Blocker
 local Auto = {}
 local Game, Job = game.PlaceId, game.JobId
 function Auto.Teleport(Game, Job, NextServer)
