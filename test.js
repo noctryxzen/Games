@@ -1,5 +1,3 @@
-getgenv().create_new_server = true
-
 local GetService = setmetatable({}, {
 	__index = function(s, n)
 		s[n] = (cloneref and clonefunction(cloneref) or function(x) return x end)(clonefunction(game.GetService)(game, n))
@@ -9,7 +7,7 @@ local GetService = setmetatable({}, {
 
 --// Execute the script for the next Teleport
 if queue_on_teleport then
-	queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Games/refs/heads/main/MortisFasterAutoFarm.luau"))()]])
+	queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Games/refs/heads/main/test.js"))()]])
 else
 	GetService.StarterGui:SetCore("SendNotification", {Title = "queue_on_teleport not supported", Text = "Please put the loadstring to your autoexec!", Duration = 5})
 end
@@ -71,16 +69,18 @@ function Auto.Block()
 			if not Auto.IsBlocked(v) then
 				GetService.StarterGui:SetCore("PromptBlockPlayer", v)
 				task.wait(.4)
-				local ______ = GetService.CoreGui:FindFirstChild("BlockingModalScreen")
-				if ______ then
-					______ = ______:FindFirstChild("3", true)
+				pcall(function()
+					local ______ = GetService.CoreGui:FindFirstChild("BlockingModalScreen")
 					if ______ then
-						GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, true, game, 0)
-						GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, false, game, 0)
-						local _____ = 0
-						repeat task.wait(.1) _____ += .1 until Auto.IsBlocked(v) or _____ >= 3
+						______ = ______:FindFirstChild("3", true)
+						if ______ then
+							GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, true, game, 0)
+							GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, false, game, 0)
+							local _____ = 0
+							repeat task.wait(.1) _____ += .1 until Auto.IsBlocked(v) or _____ >= 3
+						end
 					end
-				end
+				end)
 			end
 			break
 		end
