@@ -12,19 +12,6 @@ else
 	GetService.StarterGui:SetCore("SendNotification", {Title = "queue_on_teleport not supported", Text = "Please put the loadstring to your autoexec!", Duration = 5})
 end
 
---// Auto-Buy
-local _ = false
-local __ = not (getgenv().auto_buy or isfile("wantedcrate.json"))
-if getgenv().auto_buy or isfile("wantedcrate.json") then
-	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent.OnClientEvent:Connect(function(got, data)
-		if got == "CrateResult" then __ = true writefile("wantedcrate.json", data.crateName:gsub("Crate", "")) end
-	end)
-	task.wait(1)
-	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("BuyCrate", {crateName = (getgenv().auto_buy or readfile("wantedcrate.json")) .. "Crate"})
-	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("ClaimReward")
-	task.delay(2, function() __ = true end)
-end
-
 --// Teleporter & Blocker to avoid Reports
 local Auto = {}
 local Game, Job = game.PlaceId, game.JobId
@@ -47,56 +34,62 @@ function Auto.IsBlocked(v)
 			return not _____:FindFirstChild("FriendStatus", true)
 		end
 	end
-	return false
+	return nil
 end
 
 function Auto.Block()
-	if not (getgenv().create_new_server or isfile("autotp.txt")) then return end
+	if not (getgenv().create_new_server or isfile("autotp.json")) then return end
 	local ___ = {}
-	if isfile("autotp.txt") then
-		for i in readfile("autotp.txt"):gmatch("([^\n]+)") do
-			if not ___[i] then ___[i] = true end
-		end
+	if isfile("autotp.json") then
+		pcall(function()
+			for _, v in GetService.HttpService:JSONDecode(readfile("autotp.json")) do
+				___[v] = true
+			end
+		end)
 	end
 	if ___[Job] then return ___ end
 	local ____ = GetService.Players:GetPlayers()
 	for _, v in ____ do
-		if v ~= GetService.Players.LocalPlayer and Auto.IsBlocked(v) then
-			___[Job] = true
-			local ________ = {}
-			for i in ___ do table.insert(________, i) end
-			writefile("autotp.txt", table.concat(________, "\n"))
-			return ___
+		if v ~= GetService.Players.LocalPlayer then
+			local _____ = Auto.IsBlocked(v)
+			if _____ == true then
+				___[Job] = true
+				local ________ = {}
+				for i in ___ do table.insert(________, i) end
+				writefile("autotp.json", GetService.HttpService:JSONEncode(________))
+				return ___
+			end
 		end
 	end
 	if #____ == 1 and ____[1] == GetService.Players.LocalPlayer then
 		___[Job] = true
 		local ________ = {}
 		for i in ___ do table.insert(________, i) end
-		writefile("autotp.txt", table.concat(________, "\n"))
+		writefile("autotp.json", GetService.HttpService:JSONEncode(________))
 		return ___
 	end
 	for _, v in ____ do
-		if v ~= GetService.Players.LocalPlayer and not Auto.IsBlocked(v) then
+		if v ~= GetService.Players.LocalPlayer and Auto.IsBlocked(v) ~= true then
 			GetService.StarterGui:SetCore("PromptBlockPlayer", v)
 			task.wait(.4)
-			pcall(function()
-				local ______ = GetService.CoreGui:FindFirstChild("BlockingModalScreen")
-				if not ______ then return end
+			local ______ = GetService.CoreGui:FindFirstChild("BlockingModalScreen")
+			if ______ then
 				______ = ______:FindFirstChild("3", true)
-				if not ______ then return end
-				GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, true, game, 0)
-				GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, false, game, 0)
-				local _____ = 0
-				repeat task.wait(.1) _____ += .1 until Auto.IsBlocked(v) or _____ >= 3
-			end)
+				if ______ then
+					GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, true, game, 0)
+					GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, false, game, 0)
+					local _____ = 0
+					repeat task.wait(.1) _____ += .1 until not GetService.CoreGui:FindFirstChild("BlockingModalScreen") or _____ >= 3
+				end
+			end
+			if Auto.IsBlocked(v) ~= true then return nil end
 			break
 		end
 	end
 	___[Job] = true
 	local ________ = {}
 	for i in ___ do table.insert(________, i) end
-	writefile("autotp.txt", table.concat(________, "\n"))
+	writefile("autotp.json", GetService.HttpService:JSONEncode(________))
 	return ___
 end
 
@@ -107,17 +100,24 @@ if ___ then
 	if __________ then Auto.Teleport(Game, Job, __________) else Auto.Teleport(Game) end
 end
 
+--// Auto-Buy
+local _ = false
+local __ = not (getgenv().auto_buy or isfile("wantedcrate.json"))
+if getgenv().auto_buy or isfile("wantedcrate.json") then
+	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent.OnClientEvent:Connect(function(got, data)
+		if got == "CrateResult" then __ = true writefile("wantedcrate.json", data.crateName:gsub("Crate", "")) end
+	end)
+	task.wait(.3)
+	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("BuyCrate", {crateName = (getgenv().auto_buy or readfile("wantedcrate.json")) .. "Crate"})
+	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("ClaimReward")
+	task.delay(2, function() __ = true end)
+end
+
 --// Main
 GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Connect(function(got)
 	if got then
 		_ = true
-		local ___ = {}
-		if isfile("autotp.txt") then
-			for i in readfile("autotp.txt"):gmatch("([^\n]+)") do
-				if not ___[i] then ___[i] = true end
-			end
-		end
-		local __________ = Auto.FindServer(___)
+		local __________ = Auto.FindServer(___ or {})
 		if __________ then Auto.Teleport(Game, Job, __________) else Auto.Teleport(Game) end
 	end
 end)
