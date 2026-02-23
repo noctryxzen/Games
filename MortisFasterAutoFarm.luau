@@ -34,15 +34,16 @@ end
 
 --// Teleporter & Blocker to avoid Reports
 local Auto = {}
+local Block = loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Block.Run/refs/heads/main/Module.luau"))()
 local Game, Job = game.PlaceId, game.JobId
-function Auto.Teleport(Game, Job, NextServer)
+function Auto.Teleport(NextServer)
 	if NextServer then
 		GetService.TeleportService:TeleportToPlaceInstance(Game, NextServer)
 	else
 		GetService.TeleportService:Teleport(Game)
 	end
 end
-function Auto.Block() -- yeah sorry for leaking it
+function Auto.Block()
 	if not (getgenv().create_new_server or isfile("autotp.txt")) then return end
 	local ___ = {}
 	if isfile("autotp.txt") then
@@ -56,21 +57,8 @@ function Auto.Block() -- yeah sorry for leaking it
 		writefile("autotp.txt", table.concat(________, "\n"))
 		return ___
 	end
-	local _______ = 0
-	for i, v in ____ do
-		if v ~= GetService.Players.LocalPlayer and _______ < 1 then
-			GetService.StarterGui:SetCore("PromptBlockPlayer", v)
-			task.wait(2)
-			local ______ = GetService.CoreGui:FindFirstChild("BlockingModalScreen")
-			if not ______ then continue end
-			______ = ______.BlockingModalContainer.BlockingModalContainerWrapper.BlockingModal.AlertModal.AlertContents.Footer.Buttons["3"]
-			GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, true, game, 0)
-			GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, false, game, 0)
-			task.wait(.5)
-			___[Job] = ___[Job] and ___[Job] .. "," .. v.Name or v.Name
-			_______ += 1
-		end
-	end
+	Block.Run()
+	___[Job] = ___[Job] or ""
 	local ________ = {}
 	for i, v3 in ___ do table.insert(________, i .. "=" .. v3) end
 	writefile("autotp.txt", table.concat(________, "\n"))
@@ -98,49 +86,19 @@ if ___ then
 		end
 	end
 
-	if __________ then
-		Auto.Teleport(Game, Job, __________)
-	else
-		Auto.Teleport(Game)
-	end
+	Auto.Teleport(__________)
 end
 
 --// Main
 GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Connect(function(got)
 	if got then
 		_ = true
-		local ___ = Auto.Block()
-		if ___ then
-			local Server1 = GetService.HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. Game .. "/servers/Public?sortOrder=Asc&limit=100&excludeFullGames=true"))
-			local Server2 = GetService.HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. Game .. "/servers/Public?sortOrder=Asc&limit=100&excludeFullGames=true&cursor=" .. (Server1.nextPageCursor or "")))
-			local _________ = {}
-			for i, v2 in Server1.data do
-				if v2.playing < v2.maxPlayers then table.insert(_________, v2) end
-			end
-			for i, v2 in Server2.data do
-				if v2.playing < v2.maxPlayers then table.insert(_________, v2) end
-			end
-
-			local __________ = nil
-			for i, v2 in _________ do
-				if not ___[v2.id] then
-					__________ = v2.id
-					break
-				end
-			end
-
-			if __________ then
-				Auto.Teleport(Game, Job, __________)
-			else
-				Auto.Teleport(Game)
-			end
-		else
-			Auto.Teleport(Game, Job, Job)
-		end
+		Auto.Block()
+		Auto.Teleport(Job)
 	end
 end)
 task.delay(1, function()
-	if not _ then Auto.Teleport(Game, Job, Job) end
+	if not _ then Auto.Teleport(Job) end
 end)
 
 local FinishedPart = GetService.Workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart")
