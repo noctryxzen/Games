@@ -37,12 +37,13 @@ function Auto.IsBlocked(v)
 	end
 	return true
 end
-function Auto.Block() --// sorry for leaking it 😓😭 *burps*
+function Auto.Block() --// sorry for leaking it 😓😭
 	if not getgenv().create_new_server and not isfile("autotp.json") then return nil end
 	local ___ = {}
 	if isfile("autotp.json") then
 		pcall(function()
 			local _______ = Auto.Servers()
+			if #_______ == 0 then return end
 			for i, v in next, GetService.HttpService:JSONDecode(readfile("autotp.json")) do
 				for i2, v3 in next, _______ do if v3 == v then ___[v] = true end end
 			end
