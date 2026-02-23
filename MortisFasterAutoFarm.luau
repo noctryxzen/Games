@@ -40,7 +40,7 @@ function Auto.Teleport(Game, Job, NextServer)
 end
 
 --// Block Players & Teleport to Block Others.. sorry for leaking
-if getgenv().create_new_server == nil then getgenv().create_new_server = true end
+if getgenv().create_new_server == nil then getgenv().create_new_server = false end
 if getgenv().create_new_server then
 	local ___ = isfile("autotp.json") and GetService.HttpService:JSONDecode(readfile("autotp.json")) or {}
 	local ____ = GetService.Players:GetPlayers()
