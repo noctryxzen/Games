@@ -15,11 +15,7 @@ end
 --// Teleporter & Blocker to avoid Reports
 local Auto = {}
 local Game, Job = game.PlaceId, game.JobId
-local IsTeleporting = false
 function Auto.Teleport(Game, Job, NextServer)
-	if IsTeleporting then return end
-	IsTeleporting = true
-	task.wait(.5)
 	if NextServer then GetService.TeleportService:TeleportToPlaceInstance(Game, NextServer)
 	else GetService.TeleportService:Teleport(Game) end
 end
@@ -39,6 +35,7 @@ function Auto.IsBlocked(v)
 			return not v2:FindFirstChild("FriendStatus", true)
 		end
 	end
+	return true
 end
 function Auto.Block()
 	if not getgenv().create_new_server and not isfile("autotp.json") then return nil end
