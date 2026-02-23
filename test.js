@@ -59,7 +59,8 @@ function Auto.Block()
 	for i, v in ____ do
 		if v ~= GetService.Players.LocalPlayer and _______ < 1 then
 			GetService.StarterGui:SetCore("PromptBlockPlayer", v)
-			local ______ = GetService.CoreGui:WaitForChild("BlockingModalScreen")
+task.wait(1)
+local ______ = GetService.CoreGui:WaitForChild("BlockingModalScreen")
 				:WaitForChild("BlockingModalContainer")
 				:WaitForChild("BlockingModalContainerWrapper")
 				:WaitForChild("BlockingModal")
