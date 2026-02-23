@@ -38,14 +38,6 @@ local Game, Job = game.PlaceId, game.JobId
 function Auto.Teleport(Game, Job, NextServer)
 	GetService.TeleportService:TeleportToPlaceInstance(Game, NextServer or Job)
 end
-function Auto.BlockPlayer(v)
-	GetService.StarterGui:SetCore("PromptBlockPlayer", v)
-	task.wait(1)
-	local ______ = GetService.CoreGui:WaitForChild("BlockingModalScreen").BlockingModalContainer.BlockingModalContainerWrapper.BlockingModal.AlertModal.AlertContents.Footer.Buttons["3"]
-	GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, true, game, 0)
-	GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, false, game, 0)
-	task.wait(.5)
-end
 function Auto.Block() -- yeah sorry for leaking it
 	if not (getgenv().create_new_server or isfile("autotp.txt")) then return end
 	local ___ = {}
@@ -55,7 +47,12 @@ function Auto.Block() -- yeah sorry for leaking it
 	local _______ = 0
 	for i, v in GetService.Players:GetPlayers() do
 		if v ~= GetService.Players.LocalPlayer and _______ < 2 then
-			Auto.BlockPlayer(v)
+			GetService.StarterGui:SetCore("PromptBlockPlayer", v)
+			task.wait(1)
+			local ______ = GetService.CoreGui:WaitForChild("BlockingModalScreen").BlockingModalContainer.BlockingModalContainerWrapper.BlockingModal.AlertModal.AlertContents.Footer.Buttons["3"]
+			GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, true, game, 0)
+			GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, false, game, 0)
+			task.wait(.5)
 			___[Job] = ___[Job] and ___[Job] .. "," .. v.Name or v.Name
 			_______ += 1
 		end
