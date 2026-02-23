@@ -41,6 +41,20 @@ function Auto.FindServer(___)
 	for _, v2 in _____ do if not ___[v2.id] then return v2.id end end
 end
 
+function Auto.Click(___)
+	local ____, _____ = 0, nil
+	repeat
+		task.wait(0.1)
+		____ += 0.1
+		_____ = GetService.CoreGui:FindFirstChild("3", true)
+	until _____ or ____ >= 10
+	if not _____ then return end
+	GetService.VirtualInputManager:SendMouseButtonEvent(_____.AbsolutePosition.X + _____.AbsoluteSize.X / 2, _____.AbsolutePosition.Y + _____.AbsoluteSize.Y / 2 + 42, 0, true, game, 0)
+	GetService.VirtualInputManager:SendMouseButtonEvent(_____.AbsolutePosition.X + _____.AbsoluteSize.X / 2, _____.AbsolutePosition.Y + _____.AbsoluteSize.Y / 2 + 42, 0, false, game, 0)
+	local ______ = 0
+	repeat task.wait(0.1) ______ += 0.1 until not GetService.CoreGui:FindFirstChild("3", true) or ______ >= 5
+end
+
 function Auto.Block()
 	if not (getgenv().create_new_server or isfile("autotp.txt")) then return end
 	local ___ = {}
@@ -55,25 +69,11 @@ function Auto.Block()
 		writefile("autotp.txt", table.concat(________, "\n"))
 		return ___
 	end
-	local _______ = 0
-	for i, v in ____ do
-		if v ~= GetService.Players.LocalPlayer and _______ < 1 then
+	for _, v in ____ do
+		if v ~= GetService.Players.LocalPlayer then
 			GetService.StarterGui:SetCore("PromptBlockPlayer", v)
-task.wait(1)
-local ______ = GetService.CoreGui:WaitForChild("BlockingModalScreen")
-				:WaitForChild("BlockingModalContainer")
-				:WaitForChild("BlockingModalContainerWrapper")
-				:WaitForChild("BlockingModal")
-				:WaitForChild("AlertModal")
-				:WaitForChild("AlertContents")
-				:WaitForChild("Footer")
-				:WaitForChild("Buttons")
-				:WaitForChild("3")
-			GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, true, game, 0)
-			GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, false, game, 0)
-			______.AncestryChanged:Wait()
+			Auto.Click()
 			___[Job] = ___[Job] and ___[Job] .. "," .. v.Name or v.Name
-			_______ += 1
 		end
 	end
 	local ________ = {}
