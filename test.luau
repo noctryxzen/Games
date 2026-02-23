@@ -40,7 +40,7 @@ function Auto.IsBlocked(v)
 		end
 	end
 end
-function Auto.Block() -- sorry for leaking lol
+function Auto.Block()
 	if not getgenv().create_new_server and not isfile("autotp.json") then return nil end
 	local ___ = {}
 	if isfile("autotp.json") then
@@ -82,7 +82,7 @@ function Auto.Block() -- sorry for leaking lol
 						repeat task.wait(.1) _____ += .1 until not GetService.CoreGui:FindFirstChild("BlockingModalScreen") or _____ >= 2
 					end
 				end
-				if Auto.IsBlocked(v2) == true then
+				if Auto.IsBlocked(v2) ~= false then
 					___[Job] = true
 					local ________ = {}
 					for i in next, ___ do table.insert(________, i) end
