@@ -21,11 +21,11 @@ function Auto.Teleport(Game, Job, NextServer)
 	else GetService.TeleportService:Teleport(Game) end
 end
 
-function Auto.FindServer(___)
+function Auto.Servers()
 	local ____ = GetService.HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. Game .. "/servers/Public?sortOrder=Asc&limit=100&excludeFullGames=true"))
 	local _____ = {}
-	for _, v2 in ____.data do if v2.playing < v2.maxPlayers then table.insert(_____, v2) end end
-	for _, v2 in _____ do if not ___[v2.id] then return v2.id end end
+	for _, v2 in ____.data do if v2.playing < v2.maxPlayers then table.insert(_____, v2.id) end end
+	return _____
 end
 
 function Auto.IsBlocked(v)
@@ -42,57 +42,63 @@ function Auto.Block()
 	local ___ = {}
 	if isfile("autotp.json") then
 		pcall(function()
-			for _, v in GetService.HttpService:JSONDecode(readfile("autotp.json")) do
-				___[v] = true
-			end
+			for _, v in GetService.HttpService:JSONDecode(readfile("autotp.json")) do ___[v] = true end
 		end)
 	end
-	if ___[Job] then return ___ end
 	local ____ = GetService.Players:GetPlayers()
 	for _, v in ____ do
-		if v ~= GetService.Players.LocalPlayer and Auto.IsBlocked(v) == true then
+		if v ~= GetService.Players.LocalPlayer then
+			local _____ = Auto.IsBlocked(v)
+			if _____ == true then
+				if not ___[Job] then
+					___[Job] = true
+					local ________ = {}
+					for i in ___ do table.insert(________, i) end
+					writefile("autotp.json", GetService.HttpService:JSONEncode(________))
+				end
+				return ___
+			elseif _____ == false then
+				GetService.StarterGui:SetCore("PromptBlockPlayer", v)
+				task.wait(.4)
+				local ______ = GetService.CoreGui:FindFirstChild("BlockingModalScreen")
+				if ______ then
+					______ = ______:FindFirstChild("3", true)
+					if ______ then
+						GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, true, game, 0)
+						GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, false, game, 0)
+						local _____ = 0
+						repeat task.wait(.1) _____ += .1 until not GetService.CoreGui:FindFirstChild("BlockingModalScreen") or _____ >= 3
+					end
+				end
+				if Auto.IsBlocked(v) == true then
+					___[Job] = true
+					local ________ = {}
+					for i in ___ do table.insert(________, i) end
+					writefile("autotp.json", GetService.HttpService:JSONEncode(________))
+					return ___
+				end
+				return nil
+			end
+		end
+	end
+	if #____ == 1 and ____[1] == GetService.Players.LocalPlayer then
+		if not ___[Job] then
 			___[Job] = true
 			local ________ = {}
 			for i in ___ do table.insert(________, i) end
 			writefile("autotp.json", GetService.HttpService:JSONEncode(________))
-			return ___
 		end
-	end
-	if #____ == 1 and ____[1] == GetService.Players.LocalPlayer then
-		___[Job] = true
-		local ________ = {}
-		for i in ___ do table.insert(________, i) end
-		writefile("autotp.json", GetService.HttpService:JSONEncode(________))
 		return ___
 	end
-	for _, v in ____ do
-		if v ~= GetService.Players.LocalPlayer and Auto.IsBlocked(v) ~= true then
-			GetService.StarterGui:SetCore("PromptBlockPlayer", v)
-			task.wait(.4)
-			local ______ = GetService.CoreGui:FindFirstChild("BlockingModalScreen")
-			if ______ then
-				______ = ______:FindFirstChild("3", true)
-				if ______ then
-					GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, true, game, 0)
-					GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, false, game, 0)
-					local _____ = 0
-					repeat task.wait(.1) _____ += .1 until not GetService.CoreGui:FindFirstChild("BlockingModalScreen") or _____ >= 3
-				end
-			end
-			break
-		end
-	end
-	___[Job] = true
-	local ________ = {}
-	for i in ___ do table.insert(________, i) end
-	writefile("autotp.json", GetService.HttpService:JSONEncode(________))
-	return ___
+	return nil
 end
 
 --// Block Players & Teleport to Block Others
 local ___ = Auto.Block()
 if ___ then
-	local __________ = Auto.FindServer(___)
+	local _____ = Auto.Servers()
+	local __________ = nil
+	for _, v2 in _____ do if not ___[v2] then __________ = v2 break end end
 	if __________ then Auto.Teleport(Game, Job, __________) else Auto.Teleport(Game) end
 end
 
@@ -113,8 +119,15 @@ end
 GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Connect(function(got)
 	if got then
 		_ = true
-		local __________ = Auto.FindServer(___ or {})
-		if __________ then Auto.Teleport(Game, Job, __________) else Auto.Teleport(Game) end
+		local ___ = Auto.Block()
+		if ___ then
+			local _____ = Auto.Servers()
+			local __________ = nil
+			for _, v2 in _____ do if not ___[v2] then __________ = v2 break end end
+			if __________ then Auto.Teleport(Game, Job, __________) else Auto.Teleport(Game) end
+		else
+			Auto.Teleport(Game, Job, Job)
+		end
 	end
 end)
 task.delay(1, function()
