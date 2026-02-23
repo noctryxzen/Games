@@ -4,103 +4,147 @@ local GetService = setmetatable({}, {
 		return s[n]
 	end
 })
-
---// Execute the script for the next Teleport
-if queue_on_teleport then
-	queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Games/refs/heads/main/MortisFasterAutoFarm.luau"))()]])
-else
-	GetService.StarterGui:SetCore("SendNotification", {Title = "queue_on_teleport not supported", Text = "Please put the loadstring to your autoexec!", Duration = 5})
+--// I'll remove it tmrw no worries sigma
+if getgenv().create_new_server and not isfile("autotp.json") then
+    writefile("autotp.json", "[]")
 end
 
---// Auto-Buy
-local _ = false
-local __ = not (getgenv().auto_buy or isfile("wantedcrate.json"))
-if getgenv().auto_buy or isfile("wantedcrate.json") then
-	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent.OnClientEvent:Connect(function(got, data)
-		if got == "CrateResult" then __ = true writefile("wantedcrate.json", data.crateName:gsub("Crate", "")) end
-	end)
-	task.wait(1)
-	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("BuyCrate", {crateName = (getgenv().auto_buy or readfile("wantedcrate.json")) .. "Crate"})
-	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("ClaimReward")
-	task.delay(2, function() __ = true end)
+--// Re-Execute the Script for Next Teleport
+if queue_on_teleport then
+	queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Games/refs/heads/main/test.luau"))()]])
+else
+	GetService.StarterGui:SetCore("SendNotification", {Title = "queue_on_teleport not supported", Text = "Please put the loadstring to your autoexec!", Duration = 5})
 end
 
 --// Teleporter & Blocker to avoid Reports
 local Auto = {}
 local Game, Job = game.PlaceId, game.JobId
-
 function Auto.Teleport(Game, Job, NextServer)
 	if NextServer then GetService.TeleportService:TeleportToPlaceInstance(Game, NextServer)
 	else GetService.TeleportService:Teleport(Game) end
 end
-
-function Auto.FindServer(___)
-	local ____ = GetService.HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. Game .. "/servers/Public?sortOrder=Asc&limit=100&excludeFullGames=true"))
+function Auto.Servers()
 	local _____ = {}
-	for _, v2 in ____.data do if v2.playing < v2.maxPlayers then table.insert(_____, v2) end end
-	for _, v2 in _____ do if not ___[v2.id] then return v2.id end end
+	pcall(function()
+		local ____ = GetService.HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. Game .. "/servers/Public?sortOrder=Asc&limit=100&excludeFullGames=true"))
+		for i, v in next, ____.data do if v.playing < v.maxPlayers then table.insert(_____, v.id) end end
+	end)
+	return _____
 end
-
-function Auto.Block()
-	if not (getgenv().create_new_server or isfile("autotp.txt")) then return end
+function Auto.IsBlocked(v)
+	game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.Escape, false, game)
+	task.wait(.5)
+	for i, v2 in next, game:GetService("CoreGui").RobloxGui.SettingsClippingShield:GetDescendants() do
+		if v2.Name == "PlayerLabel" .. v.Name then
+			return not v2:FindFirstChild("FriendStatus", true)
+		end
+	end
+	return true
+end
+function Auto.Block() --// sorry for leaking it 😓😭
+	if not getgenv().create_new_server and not isfile("autotp.json") then return nil end
 	local ___ = {}
-	if isfile("autotp.txt") then
-		for i, v3 in readfile("autotp.txt"):gmatch("(.-)=(.+)") do ___[i] = v3 end
+	if isfile("autotp.json") then
+		pcall(function()
+			local _______ = Auto.Servers()
+			for i, v in next, GetService.HttpService:JSONDecode(readfile("autotp.json")) do
+				for i2, v3 in next, _______ do if v3 == v then ___[v] = true end end
+			end
+			local ________ = {}
+			for i in next, ___ do table.insert(________, i) end
+			writefile("autotp.json", GetService.HttpService:JSONEncode(________))
+		end)
 	end
 	local ____ = GetService.Players:GetPlayers()
 	if #____ == 1 and ____[1] == GetService.Players.LocalPlayer then
-		if not ___[Job] then ___[Job] = "" end
-		local ________ = {}
-		for i, v3 in ___ do if v3 ~= "" then table.insert(________, i .. "=" .. v3) end end
-		writefile("autotp.txt", table.concat(________, "\n"))
-		return ___
+		return nil
 	end
-	local _______ = 0
-	for i, v in ____ do
-		if v ~= GetService.Players.LocalPlayer and _______ < 1 then
-			GetService.StarterGui:SetCore("PromptBlockPlayer", v)
-			local ______ = GetService.CoreGui:WaitForChild("BlockingModalScreen")
-			local _______ = ______.Changed:Wait()
-			repeat task.wait() until not ______.Visible
-			___[Job] = ___[Job] and ___[Job] .. "," .. v.Name or v.Name
-			_______ += 1
+	for i, v2 in next, ____ do
+		if v2 ~= GetService.Players.LocalPlayer then
+			local _____ = Auto.IsBlocked(v2)
+			if _____ == true then
+				if not ___[Job] then
+					___[Job] = true
+					local ________ = {}
+					for i in next, ___ do table.insert(________, i) end
+					writefile("autotp.json", GetService.HttpService:JSONEncode(________))
+				end
+				return ___
+			elseif _____ == false then
+				GetService.StarterGui:SetCore("PromptBlockPlayer", v2)
+				task.wait(.2)
+				local ______ = GetService.CoreGui:FindFirstChild("BlockingModalScreen")
+				if ______ then
+					______ = ______:FindFirstChild("3", true)
+					if ______ then
+						GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, true, game, 0)
+						GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, false, game, 0)
+						local _____ = 0
+						repeat task.wait(.1) _____ += .1 until not GetService.CoreGui:FindFirstChild("BlockingModalScreen") or _____ >= 2
+					end
+				end
+				if Auto.IsBlocked(v2) ~= false then
+					___[Job] = true
+					local ________ = {}
+					for i in next, ___ do table.insert(________, i) end
+					writefile("autotp.json", GetService.HttpService:JSONEncode(________))
+					return ___
+				end
+				return nil
+			end
 		end
 	end
-	local ________ = {}
-	for i, v3 in ___ do if v3 ~= "" then table.insert(________, i .. "=" .. v3) end end
-	writefile("autotp.txt", table.concat(________, "\n"))
-	return ___
-end
-
---// Block Players & Teleport to Block Others
-local ___ = Auto.Block()
-if ___ then
-	local __________ = Auto.FindServer(___)
-	if __________ then Auto.Teleport(Game, Job, __________) else Auto.Teleport(Game) end
+	return nil
 end
 
 --// Main
+local _ = false
+local FinishedPart = GetService.Workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart")
 GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Connect(function(got)
 	if got then
 		_ = true
 		local ___ = Auto.Block()
 		if ___ then
-			local __________ = Auto.FindServer(___)
+			local _______ = Auto.Servers()
+			local __________ = nil
+			for i, v in next, _______ do if not ___[v] then __________ = v break end end
 			if __________ then Auto.Teleport(Game, Job, __________) else Auto.Teleport(Game) end
 		else
 			Auto.Teleport(Game, Job, Job)
 		end
 	end
 end)
-task.delay(1, function()
-	if not _ then Auto.Teleport(Game, Job, Job) end
-end)
-
-local FinishedPart = GetService.Workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart")
 GetService.RunService.PreSimulation:Connect(function()
-	if _ or not __ then return end
+	if _ then return end
 	local MyRoot = GetService.Players.LocalPlayer.Character and GetService.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 	if not MyRoot then return end
 	pcall(firetouchinterest, MyRoot, FinishedPart, 0)
 	pcall(firetouchinterest, MyRoot, FinishedPart, 1)
 end)
+
+--// Auto-Buy
+local __ = not (getgenv().auto_buy or isfile("wantedcrate.json"))
+if getgenv().auto_buy or isfile("wantedcrate.json") then
+	__ = false
+	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent.OnClientEvent:Connect(function(got, data)
+		if got == "CrateResult" then __ = true writefile("wantedcrate.json", data.crateName:gsub("Crate", "")) end
+	end)
+	task.wait(.1)
+	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("BuyCrate", {crateName = (getgenv().auto_buy or readfile("wantedcrate.json")) .. "Crate"})
+	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("ClaimReward")
+	task.delay(1, function() __ = true end)
+	repeat task.wait(.1) until __
+end
+
+--// Block Players & Teleport to Block Others
+local ___ = Auto.Block()
+if ___ then
+	local _______ = Auto.Servers()
+	local __________ = nil
+	for i, v in next, _______ do if not ___[v] then __________ = v break end end
+	if __________ then Auto.Teleport(Game, Job, __________) else Auto.Teleport(Game) end
+else
+	task.delay(.5, function()
+		if not _ then Auto.Teleport(Game, Job, Job) end
+	end)
+end
