@@ -19,7 +19,7 @@ local IsTeleporting = false
 function Auto.Teleport(Game, Job, NextServer)
 	if IsTeleporting then return end
 	IsTeleporting = true
-	task.wait(1)
+	task.wait(.5)
 	if NextServer then GetService.TeleportService:TeleportToPlaceInstance(Game, NextServer)
 	else GetService.TeleportService:Teleport(Game) end
 end
@@ -32,11 +32,9 @@ function Auto.Servers()
 	return _____
 end
 function Auto.IsBlocked(v)
-	GetService.VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Escape, false, game)
-	task.wait(.3)
-	GetService.VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Escape, false, game)
-	task.wait(.2)
-	for i, v2 in next, GetService.CoreGui.RobloxGui.SettingsClippingShield:GetDescendants() do
+	game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.Escape, false, game)
+	task.wait(.5)
+	for i, v2 in next, game:GetService("CoreGui").RobloxGui.SettingsClippingShield:GetDescendants() do
 		if v2.Name == "PlayerLabel" .. v.Name then
 			return not v2:FindFirstChild("FriendStatus", true)
 		end
@@ -73,7 +71,7 @@ function Auto.Block()
 				return ___
 			elseif _____ == false then
 				GetService.StarterGui:SetCore("PromptBlockPlayer", v2)
-				task.wait(.3)
+				task.wait(.2)
 				local ______ = GetService.CoreGui:FindFirstChild("BlockingModalScreen")
 				if ______ then
 					______ = ______:FindFirstChild("3", true)
@@ -81,7 +79,7 @@ function Auto.Block()
 						GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, true, game, 0)
 						GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, false, game, 0)
 						local _____ = 0
-						repeat task.wait(.1) _____ += .1 until not GetService.CoreGui:FindFirstChild("BlockingModalScreen") or _____ >= 3
+						repeat task.wait(.1) _____ += .1 until not GetService.CoreGui:FindFirstChild("BlockingModalScreen") or _____ >= 2
 					end
 				end
 				if Auto.IsBlocked(v2) == true then
@@ -114,10 +112,10 @@ if getgenv().auto_buy or isfile("wantedcrate.json") then
 	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent.OnClientEvent:Connect(function(got, data)
 		if got == "CrateResult" then __ = true writefile("wantedcrate.json", data.crateName:gsub("Crate", "")) end
 	end)
-	task.wait(.3)
+	task.wait(.1)
 	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("BuyCrate", {crateName = (getgenv().auto_buy or readfile("wantedcrate.json")) .. "Crate"})
 	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("ClaimReward")
-	task.delay(2, function() __ = true end)
+	task.delay(1, function() __ = true end)
 end
 
 --// Main
@@ -135,7 +133,7 @@ GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Conn
 		end
 	end
 end)
-task.delay(1, function()
+task.delay(.5, function()
 	if not _ then Auto.Teleport(Game, Job, Job) end
 end)
 local FinishedPart = GetService.Workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart")
