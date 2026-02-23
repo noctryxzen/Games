@@ -5,10 +5,17 @@ local GetService = setmetatable({}, {
 	end
 })
 
+--// Execute the script for the next Teleport
+if queue_on_teleport then
+	queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Games/refs/heads/main/test.luau"))()]])
+else
+	GetService.StarterGui:SetCore("SendNotification", {Title = "queue_on_teleport not supported", Text = "Please put the loadstring to your autoexec!", Duration = 5})
+end
+
+--// Teleporter & Blocker to avoid Reports
 local Auto = {}
 local Game, Job = game.PlaceId, game.JobId
 local IsTeleporting = false
-
 function Auto.Teleport(Game, Job, NextServer)
 	if IsTeleporting then return end
 	IsTeleporting = true
@@ -16,7 +23,6 @@ function Auto.Teleport(Game, Job, NextServer)
 	if NextServer then GetService.TeleportService:TeleportToPlaceInstance(Game, NextServer)
 	else GetService.TeleportService:Teleport(Game) end
 end
-
 function Auto.Servers()
 	local _____ = {}
 	pcall(function()
@@ -25,23 +31,18 @@ function Auto.Servers()
 	end)
 	return _____
 end
-
 function Auto.IsBlocked(v)
 	GetService.VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Escape, false, game)
 	task.wait(.3)
 	GetService.VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Escape, false, game)
 	task.wait(.2)
-
 	for i, v2 in next, GetService.CoreGui.RobloxGui.SettingsClippingShield:GetDescendants() do
 		if v2.Name == "PlayerLabel" .. v.Name then
 			return not v2:FindFirstChild("FriendStatus", true)
 		end
 	end
 end
-
 function Auto.Block()
-	if not (getgenv().create_new_server or isfile("autotp.json")) then return end
-
 	local ___ = {}
 	if isfile("autotp.json") then
 		pcall(function()
@@ -54,13 +55,10 @@ function Auto.Block()
 			writefile("autotp.json", GetService.HttpService:JSONEncode(________))
 		end)
 	end
-
 	local ____ = GetService.Players:GetPlayers()
-
 	if #____ == 1 and ____[1] == GetService.Players.LocalPlayer then
 		return nil
 	end
-
 	for i, v2 in next, ____ do
 		if v2 ~= GetService.Players.LocalPlayer then
 			local _____ = Auto.IsBlocked(v2)
@@ -99,6 +97,7 @@ function Auto.Block()
 	return nil
 end
 
+--// Block Players & Teleport to Block Others
 local ___ = Auto.Block()
 if ___ then
 	local _______ = Auto.Servers()
@@ -107,6 +106,7 @@ if ___ then
 	if __________ then Auto.Teleport(Game, Job, __________) else Auto.Teleport(Game) end
 end
 
+--// Auto-Buy
 local _ = false
 local __ = not (getgenv().auto_buy or isfile("wantedcrate.json"))
 if getgenv().auto_buy or isfile("wantedcrate.json") then
@@ -119,6 +119,7 @@ if getgenv().auto_buy or isfile("wantedcrate.json") then
 	task.delay(2, function() __ = true end)
 end
 
+--// Main
 GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Connect(function(got)
 	if got then
 		_ = true
@@ -136,7 +137,6 @@ end)
 task.delay(1, function()
 	if not _ then Auto.Teleport(Game, Job, Job) end
 end)
-
 local FinishedPart = GetService.Workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart")
 GetService.RunService.PreSimulation:Connect(function()
 	if _ or not __ then return end
