@@ -17,7 +17,6 @@ else
 end
 
 --// Auto-Buy
-if getgenv().auto_buy == nil then getgenv().auto_buy = isfile("wantedcrate.json") and readfile("wantedcrate.json") or false end
 local _ = false
 local __ = not getgenv().auto_buy
 if getgenv().auto_buy then
@@ -32,13 +31,14 @@ if getgenv().auto_buy then
 	task.delay(2, function() __ = true end)
 end
 
---// Teleporter & Blocker
+--// Teleporter & Blocker to avoid Reports
 local Auto = {}
 local Game, Job = game.PlaceId, game.JobId
 function Auto.Teleport(Game, Job, NextServer)
 	GetService.TeleportService:TeleportToPlaceInstance(Game, NextServer or Job)
 end
-function Auto.Block()
+function Auto.Block() -- yeah sorry for leaking it
+	if not getgenv().create_new_server then return end
 	local ___ = isfile("autotp.json") and GetService.HttpService:JSONDecode(readfile("autotp.json")) or {}
 	local ____ = GetService.Players:GetPlayers()
 	local _____ = #____ == 1 and ____[1] == GetService.Players.LocalPlayer
@@ -65,9 +65,8 @@ function Auto.Block()
 end
 
 --// Block Players & Teleport to Block Others
-if getgenv().create_new_server == nil then getgenv().create_new_server = false end
-if getgenv().create_new_server then
-	local ___ = Auto.Block()
+local ___ = Auto.Block()
+if ___ then
 	local Server1 = GetService.HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. Game .. "/servers/Public?sortOrder=Asc&limit=100&excludeFullGames=true"))
 	local Server2 = GetService.HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. Game .. "/servers/Public?sortOrder=Asc&limit=100&excludeFullGames=true&cursor=" .. (Server1.nextPageCursor or "")))
 	local _________ = {}
@@ -89,7 +88,7 @@ end
 GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Connect(function(got)
 	if got then
 		_ = true
-		if getgenv().create_new_server then Auto.Block() end
+		Auto.Block()
 		Auto.Teleport(Game, Job)
 	end
 end)
