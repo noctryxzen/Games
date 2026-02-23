@@ -5,6 +5,10 @@ local GetService = setmetatable({}, {
 	end
 })
 
+if getgenv().create_new_server and not isfile("autotp.json") then
+    writefile("autotp.json", "[]")
+end
+
 --// Re-Execute the Script for Next Teleport
 if queue_on_teleport then
 	queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Games/refs/heads/main/test.luau"))()]])
