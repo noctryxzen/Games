@@ -40,7 +40,7 @@ function Auto.IsBlocked(v)
 		end
 	end
 end
-function Auto.Block()
+function Auto.Block() -- sorry for leaking lol
 	if not getgenv().create_new_server and not isfile("autotp.json") then return nil end
 	local ___ = {}
 	if isfile("autotp.json") then
