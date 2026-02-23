@@ -37,8 +37,8 @@ local Block = loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryx
 local Auto = {}
 local Game, Job = game.PlaceId, game.JobId
 function Auto.Block()
+	if not (getgenv().create_new_server or (isfile("autotp.txt") and readfile("autotp.txt"):match("^yes"))) then return end
 	if not isfile("autotp.txt") then writefile("autotp.txt", "yes") end
-	if not readfile("autotp.txt"):match("^yes") then return end
 	Block.Run()
 	return true
 end
