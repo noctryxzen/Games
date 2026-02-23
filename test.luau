@@ -34,16 +34,9 @@ function Auto.IsBlocked(v)
 
 	for i, v2 in next, GetService.CoreGui.RobloxGui.SettingsClippingShield:GetDescendants() do
 		if v2.Name == "PlayerLabel" .. v.Name then
-			GetService.VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Escape, false, game)
-			task.wait(.2)
-			GetService.VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Escape, false, game)
 			return not v2:FindFirstChild("FriendStatus", true)
 		end
 	end
-
-	GetService.VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Escape, false, game)
-	task.wait(.2)
-	GetService.VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Escape, false, game)
 end
 
 function Auto.Block()
