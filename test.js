@@ -50,28 +50,37 @@ function Auto.IsBlocked(v)
 	return false
 end
 
-function Auto.Block()
-	if not (getgenv().create_new_server or isfile("autotp.txt")) then return end
+function Auto.Read()
 	local ___ = {}
 	if isfile("autotp.txt") then
-		for i, v3 in readfile("autotp.txt"):gmatch("(.-)=(.+)") do ___[i] = v3 end
+		for i, v3 in readfile("autotp.txt"):gmatch("(.-)=(.+)") do
+			if not ___[i] then ___[i] = v3 end
+		end
 	end
+	return ___
+end
+
+function Auto.Write(___)
+	if ___[Job] then return end
+	___[Job] = "yes"
+	local ________ = {}
+	for i, v3 in ___ do table.insert(________, i .. "=" .. v3) end
+	writefile("autotp.txt", table.concat(________, "\n"))
+end
+
+function Auto.Block()
+	if not (getgenv().create_new_server or isfile("autotp.txt")) then return end
+	local ___ = Auto.Read()
 	local ____ = GetService.Players:GetPlayers()
 	for _, v in ____ do
 		if v ~= GetService.Players.LocalPlayer and Auto.IsBlocked(v) then
-			___[Job] = "yes"
-			local ________ = {}
-			for i, v3 in ___ do table.insert(________, i .. "=" .. v3) end
-			writefile("autotp.txt", table.concat(________, "\n"))
+			Auto.Write(___)
 			return ___
 		end
 	end
 	if #____ == 1 and ____[1] == GetService.Players.LocalPlayer then
-		if ___[Job] then Auto.Teleport(Game) return end
-		___[Job] = "yes"
-		local ________ = {}
-		for i, v3 in ___ do table.insert(________, i .. "=" .. v3) end
-		writefile("autotp.txt", table.concat(________, "\n"))
+		if ___[Job] then return ___ end
+		Auto.Write(___)
 		return ___
 	end
 	for _, v in ____ do
@@ -91,10 +100,7 @@ function Auto.Block()
 			break
 		end
 	end
-	___[Job] = "yes"
-	local ________ = {}
-	for i, v3 in ___ do table.insert(________, i .. "=" .. v3) end
-	writefile("autotp.txt", table.concat(________, "\n"))
+	Auto.Write(___)
 	return ___
 end
 
@@ -109,7 +115,8 @@ end
 GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Connect(function(got)
 	if got then
 		_ = true
-		local __________ = Auto.FindServer(___ or {})
+		local ___ = Auto.Read()
+		local __________ = Auto.FindServer(___)
 		if __________ then Auto.Teleport(Game, Job, __________) else Auto.Teleport(Game) end
 	end
 end)
