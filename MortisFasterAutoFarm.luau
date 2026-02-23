@@ -38,14 +38,10 @@ local Game, Job = game.PlaceId, game.JobId
 function Auto.Teleport(Game, Job, NextServer)
 	GetService.TeleportService:TeleportToPlaceInstance(Game, NextServer or Job)
 end
-
---// Block Players & Teleport to Block Others.. sorry for leaking
-if getgenv().create_new_server == nil then getgenv().create_new_server = false end
-if getgenv().create_new_server then
+function Auto.Block()
 	local ___ = isfile("autotp.json") and GetService.HttpService:JSONDecode(readfile("autotp.json")) or {}
 	local ____ = GetService.Players:GetPlayers()
 	local _____ = #____ == 1 and ____[1] == GetService.Players.LocalPlayer
-
 	if not _____ then
 		local ______ = {}
 		local _______ = 0
@@ -65,7 +61,13 @@ if getgenv().create_new_server then
 		___[Job] = table.concat(______, ",")
 		writefile("autotp.json", GetService.HttpService:JSONEncode(___))
 	end
+	return ___
+end
 
+--// Block Players & Teleport to Block Others
+if getgenv().create_new_server == nil then getgenv().create_new_server = false end
+if getgenv().create_new_server then
+	local ___ = Auto.Block()
 	local Server1 = GetService.HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. Game .. "/servers/Public?sortOrder=Asc&limit=100&excludeFullGames=true"))
 	local Server2 = GetService.HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. Game .. "/servers/Public?sortOrder=Asc&limit=100&excludeFullGames=true&cursor=" .. (Server1.nextPageCursor or "")))
 	local _________ = {}
@@ -87,30 +89,7 @@ end
 GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Connect(function(got)
 	if got then
 		_ = true
-		if getgenv().create_new_server then
-			local ___ = isfile("autotp.json") and GetService.HttpService:JSONDecode(readfile("autotp.json")) or {}
-			local ____ = GetService.Players:GetPlayers()
-			local _____ = #____ == 1 and ____[1] == GetService.Players.LocalPlayer
-			if not _____ then
-				local ______ = {}
-				local _______ = 0
-				for i, v in ____ do
-					if v ~= GetService.Players.LocalPlayer and _______ < 2 then
-						GetService.StarterGui:SetCore("PromptBlockPlayer", v)
-						GetService.CoreGui:WaitForChild("BlockingModalScreen")
-						task.wait(.5)
-						local ________ = GetService.CoreGui.BlockingModalScreen.BlockingModalContainer.BlockingModalContainerWrapper.BlockingModal.AlertModal.AlertContents.Footer.Buttons["3"]
-						GetService.VirtualInputManager:SendMouseButtonEvent(________.AbsolutePosition.X + ________.AbsoluteSize.X / 2, ________.AbsolutePosition.Y + ________.AbsoluteSize.Y / 2 + 42, 0, true, game, 0)
-						GetService.VirtualInputManager:SendMouseButtonEvent(________.AbsolutePosition.X + ________.AbsoluteSize.X / 2, ________.AbsolutePosition.Y + ________.AbsoluteSize.Y / 2 + 42, 0, false, game, 0)
-						task.wait(.5)
-						table.insert(______, v.Name)
-						_______ += 1
-					end
-				end
-				___[Job] = table.concat(______, ",")
-				writefile("autotp.json", GetService.HttpService:JSONEncode(___))
-			end
-		end
+		if getgenv().create_new_server then Auto.Block() end
 		Auto.Teleport(Game, Job)
 	end
 end)
