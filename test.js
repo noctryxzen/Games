@@ -44,9 +44,14 @@ end
 function Auto.IsBlocked(v)
 	local ___ = GetService.CoreGui:FindFirstChild("RobloxGui", true)
 	if not ___ then return false end
-	local ____ = ___:FindFirstChild("PlayerLabel" .. v.Name, true)
+	local ____ = ___:FindFirstChild("Players", true)
 	if not ____ then return false end
-	return not ____:FindFirstChild("FriendStatus", true)
+	for _, _____ in ____:GetDescendants() do
+		if _____.Name == "PlayerLabel" .. v.Name then
+			return not _____:FindFirstChild("FriendStatus", true)
+		end
+	end
+	return false
 end
 
 function Auto.Block()
@@ -66,7 +71,7 @@ function Auto.Block()
 	for _, v in ____ do
 		if v ~= GetService.Players.LocalPlayer and not Auto.IsBlocked(v) then
 			GetService.StarterGui:SetCore("PromptBlockPlayer", v)
-			task.wait(0.5)
+			task.wait(.4)
 			local ______ = GetService.CoreGui:FindFirstChild("BlockingModalScreen")
 			if ______ then
 				______ = ______:FindFirstChild("3", true)
@@ -74,7 +79,7 @@ function Auto.Block()
 					GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, true, game, 0)
 					GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, false, game, 0)
 					local _____ = 0
-					repeat task.wait(0.1) _____ += 0.1 until Auto.IsBlocked(v) or _____ >= 5
+					repeat task.wait(.1) _____ += .1 until Auto.IsBlocked(v) or _____ >= 3
 				end
 			end
 		end
