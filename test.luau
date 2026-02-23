@@ -7,7 +7,7 @@ local GetService = setmetatable({}, {
 
 --// Execute the script for the next Teleport
 if queue_on_teleport then
-	queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Games/refs/heads/main/test.luau"))()]])
+	queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Games/refs/heads/main/test.js"))()]])
 else
 	GetService.StarterGui:SetCore("SendNotification", {Title = "queue_on_teleport not supported", Text = "Please put the loadstring to your autoexec!", Duration = 5})
 end
@@ -50,15 +50,12 @@ function Auto.Block()
 	if ___[Job] then return ___ end
 	local ____ = GetService.Players:GetPlayers()
 	for _, v in ____ do
-		if v ~= GetService.Players.LocalPlayer then
-			local _____ = Auto.IsBlocked(v)
-			if _____ == true then
-				___[Job] = true
-				local ________ = {}
-				for i in ___ do table.insert(________, i) end
-				writefile("autotp.json", GetService.HttpService:JSONEncode(________))
-				return ___
-			end
+		if v ~= GetService.Players.LocalPlayer and Auto.IsBlocked(v) == true then
+			___[Job] = true
+			local ________ = {}
+			for i in ___ do table.insert(________, i) end
+			writefile("autotp.json", GetService.HttpService:JSONEncode(________))
+			return ___
 		end
 	end
 	if #____ == 1 and ____[1] == GetService.Players.LocalPlayer then
@@ -82,7 +79,6 @@ function Auto.Block()
 					repeat task.wait(.1) _____ += .1 until not GetService.CoreGui:FindFirstChild("BlockingModalScreen") or _____ >= 3
 				end
 			end
-			if Auto.IsBlocked(v) ~= true then return nil end
 			break
 		end
 	end
