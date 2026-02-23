@@ -4,7 +4,7 @@ local GetService = setmetatable({}, {
 		return s[n]
 	end
 })
-
+-- yeah this ones useless ill remove it tmrw dw
 if getgenv().create_new_server and not isfile("autotp.json") then
     writefile("autotp.json", "[]")
 end
