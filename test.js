@@ -41,22 +41,12 @@ function Auto.FindServer(___)
 	for _, v2 in _____ do if not ___[v2.id] then return v2.id end end
 end
 
-function Auto.Click()
-	local ____, _____ = 0, nil
-	repeat
-		task.wait(0.1)
-		____ += 0.1
-		local ______ = GetService.CoreGui:FindFirstChild("BlockingModalScreen", true)
-		if ______ then
-			local _______ = ______:FindFirstChild("Buttons", true)
-			if _______ then _____ = _______:FindFirstChild("3") end
-		end
-	until _____ or ____ >= 10
-	if not _____ then return end
-	GetService.VirtualInputManager:SendMouseButtonEvent(_____.AbsolutePosition.X + _____.AbsoluteSize.X / 2, _____.AbsolutePosition.Y + _____.AbsoluteSize.Y / 2 + 42, 0, true, game, 0)
-	GetService.VirtualInputManager:SendMouseButtonEvent(_____.AbsolutePosition.X + _____.AbsoluteSize.X / 2, _____.AbsolutePosition.Y + _____.AbsoluteSize.Y / 2 + 42, 0, false, game, 0)
-	local ______ = 0
-	repeat task.wait(0.1) ______ += 0.1 until not GetService.CoreGui:FindFirstChild("BlockingModalScreen", true) or ______ >= 5
+function Auto.IsBlocked(v)
+	local ___ = GetService.CoreGui:FindFirstChild("RobloxGui", true)
+	if not ___ then return false end
+	local ____ = ___:FindFirstChild("PlayerLabel" .. v.Name, true)
+	if not ____ then return false end
+	return not ____:FindFirstChild("FriendStatus", true)
 end
 
 function Auto.Block()
@@ -75,8 +65,11 @@ function Auto.Block()
 	end
 	for _, v in ____ do
 		if v ~= GetService.Players.LocalPlayer then
-			GetService.StarterGui:SetCore("PromptBlockPlayer", v)
-			Auto.Click()
+			if not Auto.IsBlocked(v) then
+				GetService.StarterGui:SetCore("PromptBlockPlayer", v)
+				local _____ = 0
+				repeat task.wait(0.1) _____ += 0.1 until Auto.IsBlocked(v) or _____ >= 10
+			end
 			___[Job] = ___[Job] and ___[Job] .. "," .. v.Name or v.Name
 		end
 	end
