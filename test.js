@@ -41,18 +41,22 @@ function Auto.FindServer(___)
 	for _, v2 in _____ do if not ___[v2.id] then return v2.id end end
 end
 
-function Auto.Click(___)
+function Auto.Click()
 	local ____, _____ = 0, nil
 	repeat
 		task.wait(0.1)
 		____ += 0.1
-		_____ = GetService.CoreGui:FindFirstChild("3", true)
+		local ______ = GetService.CoreGui:FindFirstChild("BlockingModalScreen", true)
+		if ______ then
+			local _______ = ______:FindFirstChild("Buttons", true)
+			if _______ then _____ = _______:FindFirstChild("3") end
+		end
 	until _____ or ____ >= 10
 	if not _____ then return end
 	GetService.VirtualInputManager:SendMouseButtonEvent(_____.AbsolutePosition.X + _____.AbsoluteSize.X / 2, _____.AbsolutePosition.Y + _____.AbsoluteSize.Y / 2 + 42, 0, true, game, 0)
 	GetService.VirtualInputManager:SendMouseButtonEvent(_____.AbsolutePosition.X + _____.AbsoluteSize.X / 2, _____.AbsolutePosition.Y + _____.AbsoluteSize.Y / 2 + 42, 0, false, game, 0)
 	local ______ = 0
-	repeat task.wait(0.1) ______ += 0.1 until not GetService.CoreGui:FindFirstChild("3", true) or ______ >= 5
+	repeat task.wait(0.1) ______ += 0.1 until not GetService.CoreGui:FindFirstChild("BlockingModalScreen", true) or ______ >= 5
 end
 
 function Auto.Block()
