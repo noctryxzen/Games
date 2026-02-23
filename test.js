@@ -54,25 +54,25 @@ function Auto.Block()
 	if not (getgenv().create_new_server or isfile("autotp.txt")) then return end
 	local ___ = {}
 	if isfile("autotp.txt") then
-		for i, v3 in readfile("autotp.txt"):gmatch("(.-)=(.+)") do
-			if not ___[i] then ___[i] = v3 end
+		for i in readfile("autotp.txt"):gmatch("([^\n]+)") do
+			if not ___[i] then ___[i] = true end
 		end
 	end
 	if ___[Job] then return ___ end
 	local ____ = GetService.Players:GetPlayers()
 	for _, v in ____ do
 		if v ~= GetService.Players.LocalPlayer and Auto.IsBlocked(v) then
-			___[Job] = "yes"
+			___[Job] = true
 			local ________ = {}
-			for i, v3 in ___ do table.insert(________, i .. "=" .. v3) end
+			for i in ___ do table.insert(________, i) end
 			writefile("autotp.txt", table.concat(________, "\n"))
 			return ___
 		end
 	end
 	if #____ == 1 and ____[1] == GetService.Players.LocalPlayer then
-		___[Job] = "yes"
+		___[Job] = true
 		local ________ = {}
-		for i, v3 in ___ do table.insert(________, i .. "=" .. v3) end
+		for i in ___ do table.insert(________, i) end
 		writefile("autotp.txt", table.concat(________, "\n"))
 		return ___
 	end
@@ -93,9 +93,9 @@ function Auto.Block()
 			break
 		end
 	end
-	___[Job] = "yes"
+	___[Job] = true
 	local ________ = {}
-	for i, v3 in ___ do table.insert(________, i .. "=" .. v3) end
+	for i in ___ do table.insert(________, i) end
 	writefile("autotp.txt", table.concat(________, "\n"))
 	return ___
 end
@@ -113,8 +113,8 @@ GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Conn
 		_ = true
 		local ___ = {}
 		if isfile("autotp.txt") then
-			for i, v3 in readfile("autotp.txt"):gmatch("(.-)=(.+)") do
-				if not ___[i] then ___[i] = v3 end
+			for i in readfile("autotp.txt"):gmatch("([^\n]+)") do
+				if not ___[i] then ___[i] = true end
 			end
 		end
 		local __________ = Auto.FindServer(___)
