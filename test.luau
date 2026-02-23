@@ -5,12 +5,6 @@ local GetService = setmetatable({}, {
 	end
 })
 
-if queue_on_teleport then
-	queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Games/refs/heads/main/test.luau"))()]])
-else
-	GetService.StarterGui:SetCore("SendNotification", {Title = "queue_on_teleport not supported", Text = "Please put the loadstring to your autoexec!", Duration = 5})
-end
-
 local Auto = {}
 local Game, Job = game.PlaceId, game.JobId
 local IsTeleporting = false
@@ -24,9 +18,11 @@ function Auto.Teleport(Game, Job, NextServer)
 end
 
 function Auto.Servers()
-	local ____ = GetService.HttpService:JSONDecode(request({Url = "https://games.roblox.com/v1/games/" .. Game .. "/servers/Public?sortOrder=Asc&limit=100&excludeFullGames=true", Method = "GET"}).Body)
 	local _____ = {}
-	for i, v in next, ____.data do if v.playing < v.maxPlayers then _____[v.id] = true end end
+	pcall(function()
+		local ____ = GetService.HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. Game .. "/servers/Public?sortOrder=Asc&limit=100&excludeFullGames=true"))
+		for i, v in next, ____.data do if v.playing < v.maxPlayers then table.insert(_____, v.id) end end
+	end)
 	return _____
 end
 
@@ -49,9 +45,9 @@ function Auto.Block()
 	local ___ = {}
 	if isfile("autotp.json") then
 		pcall(function()
-			local Servers = Auto.Servers()
+			local _______ = Auto.Servers()
 			for i, v in next, GetService.HttpService:JSONDecode(readfile("autotp.json")) do
-				if Servers[v] then ___[v] = true end
+				for i2, v3 in next, _______ do if v3 == v then ___[v] = true end end
 			end
 			local ________ = {}
 			for i in next, ___ do table.insert(________, i) end
@@ -105,9 +101,9 @@ end
 
 local ___ = Auto.Block()
 if ___ then
-	local Servers = Auto.Servers()
+	local _______ = Auto.Servers()
 	local __________ = nil
-	for i in next, Servers do if not ___[i] then __________ = i break end end
+	for i, v in next, _______ do if not ___[v] then __________ = v break end end
 	if __________ then Auto.Teleport(Game, Job, __________) else Auto.Teleport(Game) end
 end
 
@@ -128,9 +124,9 @@ GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Conn
 		_ = true
 		local ___ = Auto.Block()
 		if ___ then
-			local Servers = Auto.Servers()
+			local _______ = Auto.Servers()
 			local __________ = nil
-			for i in next, Servers do if not ___[i] then __________ = i break end end
+			for i, v in next, _______ do if not ___[v] then __________ = v break end end
 			if __________ then Auto.Teleport(Game, Job, __________) else Auto.Teleport(Game) end
 		else
 			Auto.Teleport(Game, Job, Job)
