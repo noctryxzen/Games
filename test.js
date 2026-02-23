@@ -1,3 +1,5 @@
+getgenv().create_new_server = true
+
 local GetService = setmetatable({}, {
 	__index = function(s, n)
 		s[n] = (cloneref and clonefunction(cloneref) or function(x) return x end)(clonefunction(game.GetService)(game, n))
@@ -42,11 +44,7 @@ function Auto.FindServer(___)
 end
 
 function Auto.IsBlocked(v)
-	local ___ = GetService.CoreGui:FindFirstChild("RobloxGui", true)
-	if not ___ then return false end
-	local ____ = ___:FindFirstChild("Players", true)
-	if not ____ then return false end
-	for _, _____ in ____:GetDescendants() do
+	for _, _____ in GetService.CoreGui:GetDescendants() do
 		if _____.Name == "PlayerLabel" .. v.Name then
 			return not _____:FindFirstChild("FriendStatus", true)
 		end
@@ -69,19 +67,22 @@ function Auto.Block()
 		return ___
 	end
 	for _, v in ____ do
-		if v ~= GetService.Players.LocalPlayer and not Auto.IsBlocked(v) then
-			GetService.StarterGui:SetCore("PromptBlockPlayer", v)
-			task.wait(.4)
-			local ______ = GetService.CoreGui:FindFirstChild("BlockingModalScreen")
-			if ______ then
-				______ = ______:FindFirstChild("3", true)
+		if v ~= GetService.Players.LocalPlayer then
+			if not Auto.IsBlocked(v) then
+				GetService.StarterGui:SetCore("PromptBlockPlayer", v)
+				task.wait(.4)
+				local ______ = GetService.CoreGui:FindFirstChild("BlockingModalScreen")
 				if ______ then
-					GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, true, game, 0)
-					GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, false, game, 0)
-					local _____ = 0
-					repeat task.wait(.1) _____ += .1 until Auto.IsBlocked(v) or _____ >= 3
+					______ = ______:FindFirstChild("3", true)
+					if ______ then
+						GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, true, game, 0)
+						GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, false, game, 0)
+						local _____ = 0
+						repeat task.wait(.1) _____ += .1 until Auto.IsBlocked(v) or _____ >= 3
+					end
 				end
 			end
+			break
 		end
 	end
 	___[Job] = "yes"
@@ -102,13 +103,8 @@ end
 GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Connect(function(got)
 	if got then
 		_ = true
-		local ___ = Auto.Block()
-		if ___ then
-			local __________ = Auto.FindServer(___)
-			if __________ then Auto.Teleport(Game, Job, __________) else Auto.Teleport(Game) end
-		else
-			Auto.Teleport(Game, Job, Job)
-		end
+		local __________ = Auto.FindServer(___ or {})
+		if __________ then Auto.Teleport(Game, Job, __________) else Auto.Teleport(Game) end
 	end
 end)
 task.delay(1, function()
