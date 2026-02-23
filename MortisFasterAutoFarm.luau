@@ -55,7 +55,7 @@ function Auto.BlockPlayer(v)
 	task.wait(.5)
 end
 function Auto.Block() -- yeah sorry for leaking it
-	if not getgenv().create_new_server then return end
+	if not (getgenv().create_new_server or isfile("autotp.txt")) then return end
 	local ___ = {}
 	if isfile("autotp.txt") then
 		for i, v3 in readfile("autotp.txt"):gmatch("(.-)=(.+)") do ___[i] = v3 end
@@ -68,6 +68,7 @@ function Auto.Block() -- yeah sorry for leaking it
 			_______ += 1
 		end
 	end
+	if _______ == 0 and not ___[Job] then ___[Job] = "" end
 	local ________ = {}
 	for i, v3 in ___ do table.insert(________, i .. "=" .. v3) end
 	writefile("autotp.txt", table.concat(________, "\n"))
