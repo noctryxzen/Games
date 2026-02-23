@@ -26,6 +26,7 @@ if getgenv().auto_buy then
 			writefile("wantedcrate.json", data.crateName:gsub("Crate", ""))
 		end
 	end)
+	task.wait(1)
 	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("BuyCrate", {crateName = getgenv().auto_buy .. "Crate"})
 	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("ClaimReward")
 	task.delay(2, function() __ = true end)
@@ -48,12 +49,13 @@ function Auto.Block() -- yeah sorry for leaking it
 		for i, v in ____ do
 			if v ~= GetService.Players.LocalPlayer and _______ < 2 then
 				GetService.StarterGui:SetCore("PromptBlockPlayer", v)
-				GetService.CoreGui:WaitForChild("BlockingModalScreen")
-				task.wait(.5)
-				local ________ = GetService.CoreGui.BlockingModalScreen.BlockingModalContainer.BlockingModalContainerWrapper.BlockingModal.AlertModal.AlertContents.Footer.Buttons["3"]
-				GetService.VirtualInputManager:SendMouseButtonEvent(________.AbsolutePosition.X + ________.AbsoluteSize.X / 2, ________.AbsolutePosition.Y + ________.AbsoluteSize.Y / 2 + 42, 0, true, game, 0)
-				GetService.VirtualInputManager:SendMouseButtonEvent(________.AbsolutePosition.X + ________.AbsoluteSize.X / 2, ________.AbsolutePosition.Y + ________.AbsoluteSize.Y / 2 + 42, 0, false, game, 0)
-				task.wait(.5)
+				local ________ = GetService.CoreGui:FindFirstChild("BlockingModalScreen") or GetService.CoreGui:WaitForChild("BlockingModalScreen", 5)
+				if not ________ then continue end
+				task.wait(2)
+				local _________ = ________.BlockingModalContainer.BlockingModalContainerWrapper.BlockingModal.AlertModal.AlertContents.Footer.Buttons["3"]
+				GetService.VirtualInputManager:SendMouseButtonEvent(_________.AbsolutePosition.X + _________.AbsoluteSize.X / 2, _________.AbsolutePosition.Y + _________.AbsoluteSize.Y / 2 + 42, 0, true, game, 0)
+				GetService.VirtualInputManager:SendMouseButtonEvent(_________.AbsolutePosition.X + _________.AbsoluteSize.X / 2, _________.AbsolutePosition.Y + _________.AbsoluteSize.Y / 2 + 42, 0, false, game, 0)
+				task.wait(2)
 				table.insert(______, v.Name)
 				_______ += 1
 			end
