@@ -57,7 +57,17 @@ function Auto.Block()
 		for i, v3 in readfile("autotp.txt"):gmatch("(.-)=(.+)") do ___[i] = v3 end
 	end
 	local ____ = GetService.Players:GetPlayers()
+	for _, v in ____ do
+		if v ~= GetService.Players.LocalPlayer and Auto.IsBlocked(v) then
+			___[Job] = "yes"
+			local ________ = {}
+			for i, v3 in ___ do table.insert(________, i .. "=" .. v3) end
+			writefile("autotp.txt", table.concat(________, "\n"))
+			return ___
+		end
+	end
 	if #____ == 1 and ____[1] == GetService.Players.LocalPlayer then
+		if ___[Job] then Auto.Teleport(Game) return end
 		___[Job] = "yes"
 		local ________ = {}
 		for i, v3 in ___ do table.insert(________, i .. "=" .. v3) end
@@ -65,23 +75,19 @@ function Auto.Block()
 		return ___
 	end
 	for _, v in ____ do
-		if v ~= GetService.Players.LocalPlayer then
-			if not Auto.IsBlocked(v) then
-				GetService.StarterGui:SetCore("PromptBlockPlayer", v)
-				task.wait(.4)
-				pcall(function()
-					local ______ = GetService.CoreGui:FindFirstChild("BlockingModalScreen")
-					if ______ then
-						______ = ______:FindFirstChild("3", true)
-						if ______ then
-							GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, true, game, 0)
-							GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, false, game, 0)
-							local _____ = 0
-							repeat task.wait(.1) _____ += .1 until Auto.IsBlocked(v) or _____ >= 3
-						end
-					end
-				end)
-			end
+		if v ~= GetService.Players.LocalPlayer and not Auto.IsBlocked(v) then
+			GetService.StarterGui:SetCore("PromptBlockPlayer", v)
+			task.wait(.4)
+			pcall(function()
+				local ______ = GetService.CoreGui:FindFirstChild("BlockingModalScreen")
+				if not ______ then return end
+				______ = ______:FindFirstChild("3", true)
+				if not ______ then return end
+				GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, true, game, 0)
+				GetService.VirtualInputManager:SendMouseButtonEvent(______.AbsolutePosition.X + ______.AbsoluteSize.X / 2, ______.AbsolutePosition.Y + ______.AbsoluteSize.Y / 2 + 42, 0, false, game, 0)
+				local _____ = 0
+				repeat task.wait(.1) _____ += .1 until Auto.IsBlocked(v) or _____ >= 3
+			end)
 			break
 		end
 	end
