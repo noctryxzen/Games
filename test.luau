@@ -13,24 +13,28 @@ end
 
 local Auto = {}
 local Game, Job = game.PlaceId, game.JobId
+local IsTeleporting = false
 
 function Auto.Teleport(Game, Job, NextServer)
+	if IsTeleporting then return end
+	IsTeleporting = true
+	task.wait(1)
 	if NextServer then GetService.TeleportService:TeleportToPlaceInstance(Game, NextServer)
 	else GetService.TeleportService:Teleport(Game) end
 end
 
 function Auto.Servers()
-	local ____ = GetService.HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. Game .. "/servers/Public?sortOrder=Asc&limit=100&excludeFullGames=true"))
+	local ____ = GetService.HttpService:JSONDecode(request({Url = "https://games.roblox.com/v1/games/" .. Game .. "/servers/Public?sortOrder=Asc&limit=100&excludeFullGames=true", Method = "GET"}).Body)
 	local _____ = {}
-	for i, v in next, ____.data do if v.playing < v.maxPlayers then table.insert(_____, v.id) end end
+	for i, v in next, ____.data do if v.playing < v.maxPlayers then _____[v.id] = true end end
 	return _____
 end
 
 function Auto.IsBlocked(v)
 	GetService.VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Escape, false, game)
-	task.wait(.5)
-	GetService.VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Escape, false, game)
 	task.wait(.3)
+	GetService.VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Escape, false, game)
+	task.wait(.2)
 
 	for i, v2 in next, GetService.CoreGui.RobloxGui.SettingsClippingShield:GetDescendants() do
 		if v2.Name == "PlayerLabel" .. v.Name then
@@ -41,13 +45,26 @@ end
 
 function Auto.Block()
 	if not (getgenv().create_new_server or isfile("autotp.json")) then return end
+
 	local ___ = {}
 	if isfile("autotp.json") then
 		pcall(function()
-			for i, v in next, GetService.HttpService:JSONDecode(readfile("autotp.json")) do ___[v] = true end
+			local Servers = Auto.Servers()
+			for i, v in next, GetService.HttpService:JSONDecode(readfile("autotp.json")) do
+				if Servers[v] then ___[v] = true end
+			end
+			local ________ = {}
+			for i in next, ___ do table.insert(________, i) end
+			writefile("autotp.json", GetService.HttpService:JSONEncode(________))
 		end)
 	end
+
 	local ____ = GetService.Players:GetPlayers()
+
+	if #____ == 1 and ____[1] == GetService.Players.LocalPlayer then
+		return nil
+	end
+
 	for i, v2 in next, ____ do
 		if v2 ~= GetService.Players.LocalPlayer then
 			local _____ = Auto.IsBlocked(v2)
@@ -55,13 +72,13 @@ function Auto.Block()
 				if not ___[Job] then
 					___[Job] = true
 					local ________ = {}
-					for i, v3 in next, ___ do table.insert(________, i) end
+					for i in next, ___ do table.insert(________, i) end
 					writefile("autotp.json", GetService.HttpService:JSONEncode(________))
 				end
 				return ___
 			elseif _____ == false then
 				GetService.StarterGui:SetCore("PromptBlockPlayer", v2)
-				task.wait(.4)
+				task.wait(.3)
 				local ______ = GetService.CoreGui:FindFirstChild("BlockingModalScreen")
 				if ______ then
 					______ = ______:FindFirstChild("3", true)
@@ -75,7 +92,7 @@ function Auto.Block()
 				if Auto.IsBlocked(v2) == true then
 					___[Job] = true
 					local ________ = {}
-					for i, v3 in next, ___ do table.insert(________, i) end
+					for i in next, ___ do table.insert(________, i) end
 					writefile("autotp.json", GetService.HttpService:JSONEncode(________))
 					return ___
 				end
@@ -83,23 +100,14 @@ function Auto.Block()
 			end
 		end
 	end
-	if #____ == 1 and ____[1] == GetService.Players.LocalPlayer then
-		if not ___[Job] then
-			___[Job] = true
-			local ________ = {}
-			for i, v3 in next, ___ do table.insert(________, i) end
-			writefile("autotp.json", GetService.HttpService:JSONEncode(________))
-		end
-		return ___
-	end
 	return nil
 end
 
 local ___ = Auto.Block()
 if ___ then
-	local _____ = Auto.Servers()
+	local Servers = Auto.Servers()
 	local __________ = nil
-	for i, v in next, _____ do if not ___[v] then __________ = v break end end
+	for i in next, Servers do if not ___[i] then __________ = i break end end
 	if __________ then Auto.Teleport(Game, Job, __________) else Auto.Teleport(Game) end
 end
 
@@ -120,9 +128,9 @@ GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Conn
 		_ = true
 		local ___ = Auto.Block()
 		if ___ then
-			local _____ = Auto.Servers()
+			local Servers = Auto.Servers()
 			local __________ = nil
-			for i, v in next, _____ do if not ___[v] then __________ = v break end end
+			for i in next, Servers do if not ___[i] then __________ = i break end end
 			if __________ then Auto.Teleport(Game, Job, __________) else Auto.Teleport(Game) end
 		else
 			Auto.Teleport(Game, Job, Job)
