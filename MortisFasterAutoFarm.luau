@@ -45,7 +45,9 @@ end
 
 --// Block Players & Teleport to Block Others
 do
-	if not isfile("autotp.json") then writefile("autotp.json", "[]") end
+	if getgenv().create_new_server then
+		writefile("autotp.json", "[]")
+	end
 	local ___ = {}
 	pcall(function()
 		for i, v in next, GetService.HttpService:JSONDecode(readfile("autotp.json")) do
