@@ -4,10 +4,6 @@ local GetService = setmetatable({}, {
 		return s[n]
 	end
 })
---// I'll remove it tmrw no worries sigma
-if getgenv().create_new_server and not isfile("autotp.json") then
-    writefile("autotp.json", "[]")
-end
 
 --// Re-Execute the Script for Next Teleport
 if queue_on_teleport then
@@ -46,13 +42,9 @@ function Auto.Block() --// sorry for leaking it 😓😭
 	local ___ = {}
 	if isfile("autotp.json") then
 		pcall(function()
-			local _______ = Auto.Servers()
 			for i, v in next, GetService.HttpService:JSONDecode(readfile("autotp.json")) do
-				for i2, v3 in next, _______ do if v3 == v then ___[v] = true end end
+				___[v] = true
 			end
-			local ________ = {}
-			for i in next, ___ do table.insert(________, i) end
-			writefile("autotp.json", GetService.HttpService:JSONEncode(________))
 		end)
 	end
 	local ____ = GetService.Players:GetPlayers()
@@ -116,6 +108,10 @@ GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Conn
 end)
 GetService.RunService.PreSimulation:Connect(function()
 	if _ then return end
+	if getgenv().create_new_server then
+		local ____ = GetService.Players:GetPlayers()
+		if #____ ~= 1 or ____[1] ~= GetService.Players.LocalPlayer then return end
+	end
 	local MyRoot = GetService.Players.LocalPlayer.Character and GetService.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 	if not MyRoot then return end
 	pcall(firetouchinterest, MyRoot, FinishedPart, 0)
