@@ -20,17 +20,23 @@ function Auto.Teleport(Game, Job)
 	else GetService.TeleportService:Teleport(Game) end
 end
 
+--// Auto Buy
+if getgenv().auto_buy or isfile("wanted_crate.json") then
+	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent.OnClientEvent:Connect(function(got, data)
+		if got == "CrateResult" then
+			writefile("wanted_crate.json", data.crateName:gsub("Crate", ""))
+			GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("BuyCrate", {crateName = (getgenv().auto_buy or readfile("wanted_crate.json")) .. "Crate"})
+			GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("ClaimReward")
+		end
+	end)
+	task.delay(.1, function() Auto.Teleport(Game, Job) end)
+end
+
 --// Auto Farm
 local FinishedPart = GetService.Workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart")
 GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Connect(function(got)
 	if got then Auto.Teleport(Game, Job) end
 	task.delay(.1, function() Auto.Teleport(Game, Job) end)
-
-	--// Auto Buy
-	if getgenv().auto_buy or isfile("wanted_crate.json") then
-		if got == "CrateResult" then Auto.Teleport(Game, Job) end
-		task.delay(.1, function() Auto.Teleport(Game, Job) end)
-	end
 end)
 GetService.RunService.PreSimulation:Connect(function()
 	local MyRoot = GetService.Players.LocalPlayer.Character and GetService.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
