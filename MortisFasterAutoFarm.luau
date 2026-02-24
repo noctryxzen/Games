@@ -69,6 +69,6 @@ if getgenv().auto_buy then
 		end
 	end)
 	task.wait(.1)
-	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("BuyCrate", {crateName = getgenv().auto_buy .. "Crate"})
+	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("BuyCrate", {crateName = (isfile("wanted_crate.json") and readfile("wanted_crate.json") or getgenv().auto_buy) .. "Crate"})
 	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("ClaimReward")
 end
