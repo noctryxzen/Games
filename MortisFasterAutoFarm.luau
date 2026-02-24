@@ -19,9 +19,9 @@ function Auto.Teleport(Game, Job)
 	if Job then GetService.TeleportService:TeleportToPlaceInstance(Game, Job)
 	else GetService.TeleportService:Teleport(Game) end
 end
-loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Block.Run/refs/heads/main/Module.luau"))()
 function Auto.Block()
 	if getgenv().create_new_server or isfile("wanted_jobs.json") then
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Block.Run/refs/heads/main/Module.luau"))()
 		local ____ = GetService.Players:GetPlayers()
 		if #____ > 1 then
 			for i, v in next, ____ do
@@ -45,11 +45,16 @@ GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Conn
 		_ = true
 		if Auto.Block() then return end
 		Auto.Teleport(Game, Job)
+	else
+		task.delay(.5, function()
+			if _ then return end
+			Auto.Teleport(Game, Job)
+		end)
 	end
 end)
 GetService.RunService.PreSimulation:Connect(function()
 	if _ then return end
-	if getgenv().create_new_server or isfile("wanted_jobs.json") then
+	if getgenv().create_new_server then
 		local ____ = GetService.Players:GetPlayers()
 		if #____ ~= 1 or ____[1] ~= GetService.Players.LocalPlayer then return end
 	end
@@ -61,10 +66,17 @@ end)
 
 --// Auto-Buy
 if getgenv().auto_buy then
+	local __ = false
 	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent.OnClientEvent:Connect(function(got, data)
-		if got == "CrateResult" then writefile("wanted_crate.json", data.crateName:gsub("Crate", "")) end
+		if got == "CrateResult" then
+			__ = true
+			writefile("wanted_crate.json", data.crateName:gsub("Crate", ""))
+		end
 	end)
 	task.wait(.1)
 	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("BuyCrate", {crateName = getgenv().auto_buy .. "Crate"})
 	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("ClaimReward")
+	task.delay(.5, function()
+		if not __ then Auto.Teleport(Game, Job) end
+	end)
 end
