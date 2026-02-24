@@ -38,7 +38,11 @@ GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Conn
 		_ = true
 		if getgenv().create_new_server or isfile("wanted_jobs.json") then
 			for i, v in next, GetService.Players:GetPlayers() do
-				if v ~= GetService.Players.LocalPlayer then Block.Run(v) break end
+				if v ~= GetService.Players.LocalPlayer then
+					if not Block.IsBlocked(v) then Block.Run(v) end
+					Auto.Teleport(Game)
+					return
+				end
 			end
 		end
 		Auto.Teleport(Game, Job, Job)
