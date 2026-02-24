@@ -13,7 +13,7 @@ else
 end
 
 --// Teleporter & Blocker to avoid Reports
-local Auto = {}
+Auto = {}
 local Game, Job = game.PlaceId, game.JobId
 function Auto.Teleport(Game, Job, NextServer)
 	if NextServer then GetService.TeleportService:TeleportToPlaceInstance(Game, NextServer)
