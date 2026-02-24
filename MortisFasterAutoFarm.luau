@@ -20,12 +20,13 @@ function Auto.Teleport(Game, Job, NextServer)
 	else GetService.TeleportService:Teleport(Game) end
 end
 function Auto.Servers()
-	local _____ = {}
+	local _ = {}
 	pcall(function()
-		local ____ = GetService.HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. Game .. "/servers/Public?sortOrder=Asc&limit=100&excludeFullGames=true"))
-		for i, v in next, ____.data do if v.playing < v.maxPlayers then table.insert(_____, v.id) end end
+		for i, v in next, GetService.HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. Game .. "/servers/Public?sortOrder=Asc&limit=100&excludeFullGames=true")).data do
+			if v.playing < v.maxPlayers then table.insert(_, v.id) end
+		end
 	end)
-	return _____
+	return _
 end
 loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Block.Run/refs/heads/main/Module.luau"))()
 
@@ -40,34 +41,17 @@ if getgenv().auto_buy then
 end
 
 --// Block Players & Teleport to Block Others
-do
-	if getgenv().create_new_server then
-		writefile("autotp.json", "[]")
-	end
-	local ___ = {}
-	pcall(function()
-		for i, v in next, GetService.HttpService:JSONDecode(readfile("autotp.json")) do
-			___[v] = true
+if getgenv().create_new_server then
+	local ___ = isfile("autotp.json") and GetService.HttpService:JSONDecode(readfile("autotp.json")) or {}
+	if #GetService.Players:GetPlayers() > 1 then
+		for i, v in next, GetService.Players:GetPlayers() do
+			if v ~= GetService.Players.LocalPlayer then Block.Run(v) break end
 		end
-	end)
-	local ____ = GetService.Players:GetPlayers()
-	if #____ > 1 or (____[1] and ____[1] ~= GetService.Players.LocalPlayer) then
-		for i, v2 in next, ____ do
-			if v2 ~= GetService.Players.LocalPlayer then
-				Block.Run(v2)
-				break
-			end
-		end
-		if not ___[Job] then
-			___[Job] = true
-			local ________ = {}
-			for i in next, ___ do table.insert(________, i) end
-			writefile("autotp.json", GetService.HttpService:JSONEncode(________))
-		end
-		local _______ = Auto.Servers()
-		local __________ = nil
-		for i, v in next, _______ do if not ___[v] then __________ = v break end end
-		if __________ then Auto.Teleport(Game, Job, __________) else Auto.Teleport(Game) end
+		if not table.find(___, Job) then table.insert(___, Job) end
+		writefile("autotp.json", GetService.HttpService:JSONEncode(___))
+		local __ = nil
+		for i, v in next, Auto.Servers() do if not table.find(___, v) then __ = v break end end
+		if __ then Auto.Teleport(Game, Job, __) else Auto.Teleport(Game) end
 	end
 end
 
@@ -77,11 +61,8 @@ local FinishedPart = GetService.Workspace:WaitForChild("Lobby"):WaitForChild("Fi
 GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Connect(function(got)
 	if got then
 		_ = true
-		for i, v2 in next, GetService.Players:GetPlayers() do
-			if v2 ~= GetService.Players.LocalPlayer then
-				Block.Run(v2)
-				break
-			end
+		for i, v in next, GetService.Players:GetPlayers() do
+			if v ~= GetService.Players.LocalPlayer then Block.Run(v) break end
 		end
 		Auto.Teleport(Game, Job, Job)
 	end
