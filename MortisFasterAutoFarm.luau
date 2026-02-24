@@ -36,7 +36,7 @@ local FinishedPart = GetService.Workspace:WaitForChild("Lobby"):WaitForChild("Fi
 GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Connect(function(got)
 	if got then
 		_ = true
-		if getgenv().create_new_server then
+		if getgenv().create_new_server or isfile("wanted_jobs.json") then
 			for i, v in next, GetService.Players:GetPlayers() do
 				if v ~= GetService.Players.LocalPlayer then Block.Run(v) break end
 			end
@@ -46,7 +46,7 @@ GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Conn
 end)
 GetService.RunService.PreSimulation:Connect(function()
 	if _ then return end
-	if getgenv().create_new_server then
+	if getgenv().create_new_server or isfile("wanted_jobs.json") then
 		local ____ = GetService.Players:GetPlayers()
 		if #____ ~= 1 or ____[1] ~= GetService.Players.LocalPlayer then return end
 	end
@@ -67,7 +67,7 @@ if getgenv().auto_buy then
 end
 
 --// Block Players & Teleport to Block Others
-if getgenv().create_new_server then
+if getgenv().create_new_server or isfile("wanted_jobs.json") then
 	local ___ = isfile("wanted_jobs.json") and GetService.HttpService:JSONDecode(readfile("wanted_jobs.json")) or {}
 	if #GetService.Players:GetPlayers() > 1 then
 		for i, v in next, GetService.Players:GetPlayers() do
