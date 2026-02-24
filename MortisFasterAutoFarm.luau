@@ -1,3 +1,4 @@
+Tamam, full final script:
 local GetService = setmetatable({}, {
 	__index = function(s, n)
 		s[n] = (cloneref and clonefunction(cloneref) or function(x) return x end)(clonefunction(game.GetService)(game, n))
@@ -15,8 +16,8 @@ end
 --// Teleporter & Blocker to avoid Reports
 Auto = {}
 local Game, Job = game.PlaceId, game.JobId
-function Auto.Teleport(Game, Job, NextServer)
-	if NextServer then GetService.TeleportService:TeleportToPlaceInstance(Game, NextServer)
+function Auto.Teleport(Game, Job)
+	if Job then GetService.TeleportService:TeleportToPlaceInstance(Game, Job)
 	else GetService.TeleportService:Teleport(Game) end
 end
 loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Block.Run/refs/heads/main/Module.luau"))()
@@ -44,7 +45,7 @@ GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Conn
 	if got then
 		_ = true
 		if Auto.Block() then return end
-		Auto.Teleport(Game, Job, Job)
+		Auto.Teleport(Game, Job)
 	end
 end)
 GetService.RunService.PreSimulation:Connect(function()
