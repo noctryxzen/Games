@@ -15,9 +15,18 @@ end
 --// Teleporter & Blocker to avoid Reports
 Auto = {}
 local Game, Job = game.PlaceId, game.JobId
-function Auto.Teleport(Game, Job)
-	if Job then GetService.TeleportService:TeleportToPlaceInstance(Game, Job)
+function Auto.Teleport(Game, Job, NextServer)
+	if NextServer then GetService.TeleportService:TeleportToPlaceInstance(Game, NextServer)
 	else GetService.TeleportService:Teleport(Game) end
+end
+function Auto.Servers()
+	local _ = {}
+	pcall(function()
+		for i, v in next, GetService.HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. Game .. "/servers/Public?sortOrder=Asc&limit=100&excludeFullGames=true")).data do
+			if v.playing < v.maxPlayers then table.insert(_, v.id) end
+		end
+	end)
+	return _
 end
 function Auto.Block()
 	if getgenv().create_new_server or isfile("wanted_jobs.json") then
@@ -26,10 +35,6 @@ function Auto.Block()
 			for i, v in next, ____ do
 				if v ~= GetService.Players.LocalPlayer then Block.Run(v) break end
 			end
-			local ___ = isfile("wanted_jobs.json") and GetService.HttpService:JSONDecode(readfile("wanted_jobs.json")) or {}
-			if not table.find(___, Job) then table.insert(___, Job) end
-			writefile("wanted_jobs.json", GetService.HttpService:JSONEncode(___))
-			Auto.Teleport(Game)
 			return true
 		end
 	end
@@ -43,13 +48,13 @@ local FinishedPart = GetService.Workspace:WaitForChild("Lobby"):WaitForChild("Fi
 GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Connect(function(got)
 	if got then
 		_ = true
-		if Auto.Block() then return end
-		Auto.Teleport(Game, Job)
+		if Auto.Block() then Auto.Teleport(Game) return end
+		Auto.Teleport(Game, Job, Job)
 	end
 end)
 GetService.RunService.PreSimulation:Connect(function()
 	if _ then return end
-	if getgenv().create_new_server then
+	if getgenv().create_new_server or isfile("wanted_jobs.json") then
 		local ____ = GetService.Players:GetPlayers()
 		if #____ ~= 1 or ____[1] ~= GetService.Players.LocalPlayer then return end
 	end
@@ -61,14 +66,25 @@ end)
 
 --// Auto-Buy
 if getgenv().auto_buy then
-	local __ = false
 	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent.OnClientEvent:Connect(function(got, data)
-		if got == "CrateResult" then
-			__ = true
-			writefile("wanted_crate.json", data.crateName:gsub("Crate", ""))
-		end
+		if got == "CrateResult" then writefile("wanted_crate.json", data.crateName:gsub("Crate", "")) end
 	end)
 	task.wait(.1)
-	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("BuyCrate", {crateName = (isfile("wanted_crate.json") and readfile("wanted_crate.json") or getgenv().auto_buy) .. "Crate"})
+	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("BuyCrate", {crateName = getgenv().auto_buy .. "Crate"})
 	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("ClaimReward")
+end
+
+--// Block Players & Teleport to Block Others
+if getgenv().create_new_server or isfile("wanted_jobs.json") then
+	local ___ = isfile("wanted_jobs.json") and GetService.HttpService:JSONDecode(readfile("wanted_jobs.json")) or {}
+	if #GetService.Players:GetPlayers() > 1 then
+		for i, v in next, GetService.Players:GetPlayers() do
+			if v ~= GetService.Players.LocalPlayer then Block.Run(v) break end
+		end
+		if not table.find(___, Job) then table.insert(___, Job) end
+		writefile("wanted_jobs.json", GetService.HttpService:JSONEncode(___))
+		local __ = nil
+		for i, v in next, Auto.Servers() do if not table.find(___, v) then __ = v break end end
+		if __ then Auto.Teleport(Game, Job, __) else Auto.Teleport(Game) end
+	end
 end
