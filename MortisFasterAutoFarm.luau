@@ -13,7 +13,7 @@ else
 end
 
 --// Teleporter & Blocker to avoid Reports
-Auto = {}
+local Auto = {}
 local Game, Job = game.PlaceId, game.JobId
 function Auto.Teleport(Game, Job)
 	if Job then GetService.TeleportService:TeleportToPlaceInstance(Game, Job)
@@ -66,10 +66,9 @@ end)
 
 --// Auto-Buy
 if getgenv().auto_buy then
-	local __ = false
 	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent.OnClientEvent:Connect(function(got, data)
 		if got == "CrateResult" then
-			__ = true
+			_ = true
 			writefile("wanted_crate.json", data.crateName:gsub("Crate", ""))
 		end
 	end)
@@ -77,6 +76,6 @@ if getgenv().auto_buy then
 	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("BuyCrate", {crateName = getgenv().auto_buy .. "Crate"})
 	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("ClaimReward")
 	task.delay(.5, function()
-		if not __ then Auto.Teleport(Game, Job) end
+		if not _ then Auto.Teleport(Game, Job) end
 	end)
 end
