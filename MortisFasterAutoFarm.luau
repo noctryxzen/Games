@@ -19,9 +19,9 @@ function Auto.Teleport(Game, Job, NextServer)
 	if NextServer then GetService.TeleportService:TeleportToPlaceInstance(Game, NextServer)
 	else GetService.TeleportService:Teleport(Game) end
 end
+loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Block.Run/refs/heads/main/Module.luau"))()
 function Auto.Block()
 	if getgenv().create_new_server or isfile("wanted_jobs.json") then
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Block.Run/refs/heads/main/Module.luau"))()
 		local ____ = GetService.Players:GetPlayers()
 		if #____ > 1 then
 			for i, v in next, ____ do
