@@ -39,6 +39,9 @@ function Auto.IsBlocked(v)
 end
 function Auto.Block() --// sorry for leaking it 😓😭
 	if not getgenv().create_new_server and not isfile("autotp.json") then return nil end
+	if getgenv().create_new_server and not isfile("autotp.json") then
+		writefile("autotp.json", "[]")
+	end
 	local ___ = {}
 	if isfile("autotp.json") then
 		pcall(function()
