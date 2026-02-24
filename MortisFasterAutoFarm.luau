@@ -30,39 +30,16 @@ function Auto.Servers()
 end
 loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Block.Run/refs/heads/main/Module.luau"))()
 
---// Auto-Buy
-if getgenv().auto_buy then
-	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent.OnClientEvent:Connect(function(got, data)
-		if got == "CrateResult" then writefile("wantedcrate.json", data.crateName:gsub("Crate", "")) end
-	end)
-	task.wait(.1)
-	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("BuyCrate", {crateName = getgenv().auto_buy .. "Crate"})
-	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("ClaimReward")
-end
-
---// Block Players & Teleport to Block Others
-if getgenv().create_new_server then
-	local ___ = isfile("autotp.json") and GetService.HttpService:JSONDecode(readfile("autotp.json")) or {}
-	if #GetService.Players:GetPlayers() > 1 then
-		for i, v in next, GetService.Players:GetPlayers() do
-			if v ~= GetService.Players.LocalPlayer then Block.Run(v) break end
-		end
-		if not table.find(___, Job) then table.insert(___, Job) end
-		writefile("autotp.json", GetService.HttpService:JSONEncode(___))
-		local __ = nil
-		for i, v in next, Auto.Servers() do if not table.find(___, v) then __ = v break end end
-		if __ then Auto.Teleport(Game, Job, __) else Auto.Teleport(Game) end
-	end
-end
-
 --// Main
 local _ = false
 local FinishedPart = GetService.Workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart")
 GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Connect(function(got)
 	if got then
 		_ = true
-		for i, v in next, GetService.Players:GetPlayers() do
-			if v ~= GetService.Players.LocalPlayer then Block.Run(v) break end
+		if getgenv().create_new_server then
+			for i, v in next, GetService.Players:GetPlayers() do
+				if v ~= GetService.Players.LocalPlayer then Block.Run(v) break end
+			end
 		end
 		Auto.Teleport(Game, Job, Job)
 	end
@@ -78,3 +55,28 @@ GetService.RunService.PreSimulation:Connect(function()
 	pcall(firetouchinterest, MyRoot, FinishedPart, 0)
 	pcall(firetouchinterest, MyRoot, FinishedPart, 1)
 end)
+
+--// Auto-Buy
+if getgenv().auto_buy then
+	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent.OnClientEvent:Connect(function(got, data)
+		if got == "CrateResult" then writefile("wanted_crate.json", data.crateName:gsub("Crate", "")) end
+	end)
+	task.wait(.1)
+	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("BuyCrate", {crateName = getgenv().auto_buy .. "Crate"})
+	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("ClaimReward")
+end
+
+--// Block Players & Teleport to Block Others
+if getgenv().create_new_server then
+	local ___ = isfile("wanted_jobs.json") and GetService.HttpService:JSONDecode(readfile("wanted_jobs.json")) or {}
+	if #GetService.Players:GetPlayers() > 1 then
+		for i, v in next, GetService.Players:GetPlayers() do
+			if v ~= GetService.Players.LocalPlayer then Block.Run(v) break end
+		end
+		if not table.find(___, Job) then table.insert(___, Job) end
+		writefile("wanted_jobs.json", GetService.HttpService:JSONEncode(___))
+		local __ = nil
+		for i, v in next, Auto.Servers() do if not table.find(___, v) then __ = v break end end
+		if __ then Auto.Teleport(Game, Job, __) else Auto.Teleport(Game) end
+	end
+end
