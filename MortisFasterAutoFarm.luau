@@ -30,17 +30,13 @@ end
 loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Block.Run/refs/heads/main/Module.luau"))()
 
 --// Auto-Buy
-local __ = not (getgenv().auto_buy or isfile("wantedcrate.json"))
-if getgenv().auto_buy or isfile("wantedcrate.json") then
-	__ = false
+if getgenv().auto_buy then
 	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent.OnClientEvent:Connect(function(got, data)
-		if got == "CrateResult" then __ = true writefile("wantedcrate.json", data.crateName:gsub("Crate", "")) end
+		if got == "CrateResult" then writefile("wantedcrate.json", data.crateName:gsub("Crate", "")) end
 	end)
 	task.wait(.1)
-	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("BuyCrate", {crateName = (getgenv().auto_buy or readfile("wantedcrate.json")) .. "Crate"})
+	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("BuyCrate", {crateName = getgenv().auto_buy .. "Crate"})
 	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("ClaimReward")
-	task.delay(1, function() __ = true end)
-	repeat task.wait(.1) until __
 end
 
 --// Block Players & Teleport to Block Others
@@ -56,7 +52,12 @@ do
 	end)
 	local ____ = GetService.Players:GetPlayers()
 	if #____ > 1 or (____[1] and ____[1] ~= GetService.Players.LocalPlayer) then
-		Block.Run()
+		for i, v2 in next, ____ do
+			if v2 ~= GetService.Players.LocalPlayer then
+				Block.Run(v2)
+				break
+			end
+		end
 		if not ___[Job] then
 			___[Job] = true
 			local ________ = {}
@@ -76,7 +77,12 @@ local FinishedPart = GetService.Workspace:WaitForChild("Lobby"):WaitForChild("Fi
 GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Connect(function(got)
 	if got then
 		_ = true
-		Block.Run()
+		for i, v2 in next, GetService.Players:GetPlayers() do
+			if v2 ~= GetService.Players.LocalPlayer then
+				Block.Run(v2)
+				break
+			end
+		end
 		Auto.Teleport(Game, Job, Job)
 	end
 end)
