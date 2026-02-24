@@ -45,11 +45,6 @@ GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Conn
 		_ = true
 		if Auto.Block() then return end
 		Auto.Teleport(Game, Job)
-	else
-		task.delay(.5, function()
-			if _ then return end
-			Auto.Teleport(Game, Job)
-		end)
 	end
 end)
 GetService.RunService.PreSimulation:Connect(function()
@@ -76,7 +71,4 @@ if getgenv().auto_buy then
 	task.wait(.1)
 	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("BuyCrate", {crateName = getgenv().auto_buy .. "Crate"})
 	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("ClaimReward")
-	task.delay(.5, function()
-		if not __ then Auto.Teleport(Game, Job) end
-	end)
 end
