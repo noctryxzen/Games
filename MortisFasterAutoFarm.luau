@@ -47,12 +47,12 @@ GetService.RunService.PreSimulation:Connect(function()
 end)
 
 --// Auto-Buy
-if getgenv().auto_buy then
+if getgenv().auto_buy or isfile("wanted_crate.json") then
 	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent.OnClientEvent:Connect(function(got, data)
 		if got == "CrateResult" then writefile("wanted_crate.json", data.crateName:gsub("Crate", "")) end
 	end)
 	task.wait(.1)
-	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("BuyCrate", {crateName = (isfile("wanted_crate.json") and readfile("wanted_crate.json") or getgenv().auto_buy) .. "Crate"})
+	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("BuyCrate", {crateName = (getgenv().auto_buy or readfile("wanted_crate.json")) .. "Crate"})
 	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("ClaimReward")
 end
 
