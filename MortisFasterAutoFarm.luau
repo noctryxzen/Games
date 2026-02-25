@@ -27,7 +27,7 @@ end
 
 -- // Auto Farm
 local FinishedPart = GetService.Workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart")
-if not (getgenv().create_new_server or isfile("wanted_crate.json") and readfile("wanted_crate.json") == "yes" and #GetService.Players:GetPlayers() > 1) then
+if not (getgenv().create_new_server or isfile("wanted_creator.json") and readfile("wanted_creator.json") == "yes" and #GetService.Players:GetPlayers() > 1) then
 	GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Connect(function(got)
 		if got then Auto.Teleport(Game, Job) end
 	end)
@@ -48,13 +48,13 @@ if getgenv().auto_buy or isfile("wanted_crate.json") and readfile("wanted_crate.
 		if got == "CrateResult" then writefile("wanted_crate.json", data.crateName:gsub("Crate", "")) end
 	end)
 	task.wait(.2)
-	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("BuyCrate", {crateName = (getgenv().auto_buy or readfile("wanted_crate.json")) .. "Crate"})
+	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("BuyCrate", {crateName = (`{getgenv().auto_buy or readfile("wanted_crate.json")}Crate`)})
 	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("ClaimReward")
 end
 
 -- // Block Players
-if getgenv().create_new_server or isfile("wanted_crate.json") and readfile("wanted_crate.json") == "yes" then
-	writefile("wanted_crate.json", "yes")
+if getgenv().create_new_server or isfile("wanted_creator.json") and readfile("wanted_creator.json") == "yes" then
+	writefile("wanted_creator.json", "yes")
 	for i, v in next, GetService.Players:GetPlayers() do
 		if v ~= GetService.Players.LocalPlayer then
 			if Block.IsBlocked(v) then
