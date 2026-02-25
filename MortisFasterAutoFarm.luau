@@ -14,7 +14,7 @@ else
 	GetService.StarterGui:SetCore("SendNotification", {Title = "queue_on_teleport not supported", Text = "Please put the loadstring to your autoexec!", Duration = 5})
 end
 
---// Teleporter
+-- // Teleporter
 Auto = {}
 local Game, Job = game.PlaceId, game.JobId
 local __ = false
@@ -25,9 +25,9 @@ function Auto.Teleport(Game, Job)
 	else GetService.TeleportService:Teleport(Game) end
 end
 
---// Auto Farm
+-- // Auto Farm
 local FinishedPart = GetService.Workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart")
-if not (getgenv().create_new_server and #GetService.Players:GetPlayers() > 1) then
+if not (getgenv().create_new_server or isfile("wanted_creator.json") and #GetService.Players:GetPlayers() > 1) then
 	GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Connect(function(got)
 		if got then Auto.Teleport(Game, Job) end
 	end)
@@ -42,7 +42,7 @@ if not (getgenv().create_new_server and #GetService.Players:GetPlayers() > 1) th
 	end)
 end
 
---// Auto Buy
+-- // Auto Buy
 if getgenv().auto_buy or isfile("wantedcrate.json") then
 	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent.OnClientEvent:Connect(function(got, data)
 		if got == "CrateResult" then writefile("wantedcrate.json", data.crateName:gsub("Crate", "")) end
@@ -52,8 +52,11 @@ if getgenv().auto_buy or isfile("wantedcrate.json") then
 	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("ClaimReward")
 end
 
---// Block Players
-if getgenv().create_new_server then
+-- // Block Players
+if getgenv().create_new_server or isfile("wanted_creator.json") then
+	if not isfile("wanted_creator.json") then
+		writefile("wanted_creator.json", "yes")
+	end
 	for i, v in next, GetService.Players:GetPlayers() do
 		if v ~= GetService.Players.LocalPlayer then
 			if Block.IsBlocked(v) then
