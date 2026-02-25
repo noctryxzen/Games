@@ -60,7 +60,7 @@ if getgenv().create_new_server or isfile("wanted_crate.json") and readfile("want
 			if Block.IsBlocked(v) then
 				Auto.Teleport(Game)
 			else
-				task.delay(.4, function()
+				task.delay(.7, function()
 					Block.Run(v)
 					Auto.Teleport(Game)
 				end)
