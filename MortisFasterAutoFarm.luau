@@ -7,14 +7,14 @@ local GetService = setmetatable({}, {
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Block.Run/refs/heads/main/Module.luau"))()
 
--- // Re-Execute the Script for Next Teleport
+--// Re-Execute the Script for Next Teleport
 if queue_on_teleport then
 	queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Games/refs/heads/main/MortisFasterAutoFarm.luau"))()]])
 else
 	GetService.StarterGui:SetCore("SendNotification", {Title = "queue_on_teleport not supported", Text = "Please put the loadstring to your autoexec!", Duration = 5})
 end
 
--- // Teleporter
+--// Teleporter
 Auto = {}
 local Game, Job = game.PlaceId, game.JobId
 local __ = false
@@ -25,7 +25,7 @@ function Auto.Teleport(Game, Job)
 	else GetService.TeleportService:Teleport(Game) end
 end
 
--- // Auto Farm
+--// Auto Farm
 local FinishedPart = GetService.Workspace:WaitForChild("Lobby"):WaitForChild("FinishedPart")
 if not (getgenv().create_new_server or isfile("wanted_creator.json") and readfile("wanted_creator.json") == "yes" and #GetService.Players:GetPlayers() > 1) then
 	GetService.ReplicatedStorage.Events.GameEvents.StudPopupEvent.OnClientEvent:Connect(function(got)
@@ -42,17 +42,17 @@ if not (getgenv().create_new_server or isfile("wanted_creator.json") and readfil
 	end)
 end
 
--- // Auto Buy
-if getgenv().auto_buy or isfile("wanted_crate.json") and readfile("wanted_crate.json") ~= "yes" then
+--// Auto Buy
+if getgenv().auto_buy or isfile("wanted_crate.json") then
 	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent.OnClientEvent:Connect(function(got, data)
 		if got == "CrateResult" then writefile("wanted_crate.json", data.crateName:gsub("Crate", "")) end
 	end)
 	task.wait(.2)
-	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("BuyCrate", {crateName = (`{getgenv().auto_buy or readfile("wanted_crate.json")}Crate`)})
+	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("BuyCrate", {crateName = (getgenv().auto_buy or readfile("wanted_crate.json")) .. "Crate"})
 	GetService.ReplicatedStorage.Events.GameEvents.ShopEvent:FireServer("ClaimReward")
 end
 
--- // Block Players
+--// Block Players
 if getgenv().create_new_server or isfile("wanted_creator.json") and readfile("wanted_creator.json") == "yes" then
 	writefile("wanted_creator.json", "yes")
 	for i, v in next, GetService.Players:GetPlayers() do
