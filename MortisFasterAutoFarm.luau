@@ -62,7 +62,7 @@ if getgenv().create_new_server or isfile("wanted_creator.json") then
 			if Block.IsBlocked(v) then
 				Auto.Teleport(Game)
 			else
-				task.delay(.3, function()
+				task.delay(.5, function()
 					Block.Run(v)
 					Auto.Teleport(Game)
 				end)
