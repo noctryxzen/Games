@@ -7,6 +7,12 @@ local GetService = setmetatable({}, {
 	end
 })
 
+if queue_on_teleport then
+	queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Games/refs/heads/main/MurDurrFasterAutoFarm.luau"))()]])
+else
+	SendNotification({Title = "queue_on_teleport not supported", Text = "Please put the loadstring to your autoexec!", Duration = 5})
+end
+
 MurDurr = {}
 function MurDurr:Auto()
 	local _ = false
