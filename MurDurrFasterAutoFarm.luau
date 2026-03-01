@@ -13,6 +13,12 @@ else
 	SendNotification({Title = "queue_on_teleport not supported", Text = "Please put the loadstring to your autoexec!", Duration = 15})
 end
 
+GetService.TeleportService.TeleportInitFailed:Connect(function(Player, Result, Error)
+	SendNotification({Title = "Teleport Failed", Text = "Retrying... (" .. Error .. ")", Duration = 3})
+	task.wait(3)
+	GetService.TeleportService:Teleport(game.PlaceId)
+end)
+
 MurDurr = {}
 function MurDurr:Auto()
 	local _ = false
@@ -27,7 +33,9 @@ function MurDurr:Auto()
 		if _ then return end
 		_ = true
 		SendNotification({Title = "Processing", Text = "Got the Durr! Server-hopping as fast.", Duration = math.huge})
-		task.delay(.3, function() GetService.TeleportService:Teleport(game.PlaceId) end)
+		task.delay(.3, function()
+			GetService.TeleportService:Teleport(game.PlaceId)
+		end)
 	end)
 end
 if isfile("im_autofarming.json") and readfile("im_autofarming.json") == "yes im autofarming bro" then
