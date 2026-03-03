@@ -27,7 +27,7 @@ function Cheez:Farm()
 		_ = true
 		SendNotification({Title = "Processing", Text = "Timeout! Server-hopping as fast.", Duration = math.huge})
 		GetService.TeleportService:Teleport(game.PlaceId)
-		task.delay(2, function() GetService.TeleportService:Teleport(game.PlaceId) end)
+		task.delay(.2, function() GetService.TeleportService:Teleport(game.PlaceId) end)
 	end)
 end
 if isfile("im_autofarming.json") and readfile("im_autofarming.json") == "yes im autofarming bro" then
