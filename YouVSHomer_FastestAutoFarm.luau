@@ -1,4 +1,9 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Getter/refs/heads/main/GetFS.luau"))()
+if queue_on_teleport then
+	queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/noctryxzen/Games/refs/heads/main/YouVSHomer_FastestAutoFarm.luau"))()]])
+else
+	SendNotification({Title = "queue_on_teleport not supported", Text = "Please put the loadstring to your autoexec!", Duration = 15})
+end
 GetService.RunService.PreSimulation:Connect(function()
 	for i, v in next, GetService.Workspace.lobby.Obby:GetDescendants() do
 		if v.Name == "Winpad" then
