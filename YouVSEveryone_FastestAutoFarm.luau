@@ -5,11 +5,13 @@ if queue_on_teleport then
 else
 	SendNotification({Title = "queue_on_teleport not supported", Text = "Please put the loadstring to your autoexec!", Duration = 15})
 end
+local TeleportPart = GetService.Workspace:WaitForChild("TeleportParts"):WaitForChild("TeleportPart1"):WaitForChild("TeleportPart1")
+local Cash = GetService.Players.LocalPlayer:WaitForChild("leaderstats"):WaitForChild("Cash")
 GetService.RunService.PreSimulation:Connect(function()
-	firetouchinterest(GetService.Players.LocalPlayer.Character and GetService.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart"), GetService.Workspace.TeleportParts.TeleportPart1.TeleportPart1, 0)
-	firetouchinterest(GetService.Players.LocalPlayer.Character and GetService.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart"), GetService.Workspace.TeleportParts.TeleportPart1.TeleportPart1, 1)
+	firetouchinterest(GetService.Players.LocalPlayer.Character and GetService.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart"), TeleportPart, 0)
+	firetouchinterest(GetService.Players.LocalPlayer.Character and GetService.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart"), TeleportPart, 1)
 end)
-GetService.Players.LocalPlayer.leaderstats.Cash.Changed:Connect(function()
+Cash.Changed:Connect(function()
 	task.wait(.1)
 	GetService.TeleportService:Teleport(game.PlaceId, GetService.Players.LocalPlayer)
 end)
